@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechConnect – Secure Freelance Marketplace in Cameroon</title>
+  <meta name="description" content="Hire skilled freelancers or offer your expertise with milestone‑based escrow payments via Nkwa Pay." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="header__inner">
+      <a href="/" class="logo" aria-label="TechConnect home">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8E44AD" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>TechConnect</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <nav class="nav" id="nav">
+        <a href="#how-it-works">How it works</a>
+        <a href="#services">Services</a>
+        <a href="#escrow">Escrow</a>
+        <a href="../Module A/Feature 2/login.html">Sign in</a>
+        <a href="../Module A/Feature 1/register.html" class="btn btn--small">Join free</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="hero__content">
+        <p class="hero__label">Cameroon's secure freelance marketplace</p>
+        <h1>Top tech talent.<br><span class="highlight">Secure payments.</span><br>Real results.</h1>
+        <p class="hero__lead">Hire skilled freelancers or sell your expertise — every payment held safely in Nkwa Pay escrow until you approve the work.</p>
+        <div class="hero__actions">
+          <a href="signup.html?role=client" class="btn btn--accent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            Hire a Freelancer
+          </a>
+          <a href="signup.html?role=skilled" class="btn btn--outline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+            Find Work
+          </a>
+        </div>
+        <form class="hero__search" id="searchForm" role="search">
+          <input type="text" id="searchInput" placeholder="Python, UI Design, Video Editing…" aria-label="Search services" />
+          <button type="submit">Search</button>
+        </form>
+        <div class="hero__trust">
+          <span>Escrow‑protected</span>
+          <span>·</span>
+          <span>Paid in FCFA</span>
+          <span>·</span>
+          <span>5,000+ milestones completed</span>
+        </div>
+      </div>
+      <div class="hero__visual" aria-hidden="true">
+        <div class="card card--job">
+          <div class="card__header">
+            <div class="avatar avatar--purple"></div>
+            <div>
+              <strong>UI/UX Design Project</strong>
+              <small>Posted by Amina B. · Douala</small>
+            </div>
+            <span class="badge">Open</span>
+          </div>
+          <div class="card__tags"><span>Figma</span><span>Prototyping</span><span>Mobile</span></div>
+          <div class="card__footer"><strong>150,000 FCFA</strong><span>3 milestones</span></div>
+        </div>
+        <div class="card card--escrow">
+          <p class="card__title">Nkwa Pay Escrow</p>
+          <div class="progress"><div class="progress__bar" style="width:66%"></div></div>
+          <p>Milestone 2 of 3</p>
+          <div><span>50,000 FCFA held</span><span>100,000 released</span></div>
+        </div>
+        <div class="card card--review">
+          <div class="stars">★★★★★</div>
+          <p class="card__quote">"Delivered in 3 days. Exactly what I needed."</p>
+          <small>— Jean‑Marc K., Full‑Stack Dev</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section section--alt" id="how-it-works">
+      <div class="container">
+        <p class="label">Simple process</p>
+        <h2>How TechConnect works</h2>
+        <p class="section__sub">From posting a job to receiving payment — every step is structured, transparent, and protected.</p>
+        <ol class="steps">
+          <li class="step">
+            <span class="step__num">01</span>
+            <span class="step__icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8E44AD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span>
+            <div>
+              <h3>Create your profile</h3>
+              <p>Join as a skilled individual or client. List your skills, portfolio, and what you need — free in under two minutes.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step__num">02</span>
+            <span class="step__icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8E44AD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+            <div>
+              <h3>Post or find a job</h3>
+              <p>Clients define milestones and budgets in FCFA. Freelancers browse smart‑matched jobs and submit offers.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step__num">03</span>
+            <span class="step__icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8E44AD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 8.1-7.66 9.95a1 1 0 0 1-.67-.01C7.5 21.1 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.06 1.06 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg></span>
+            <div>
+              <h3>Work & pay securely</h3>
+              <p>Funds sit in Nkwa Pay escrow. Release payment only after milestone approval. 10% platform commission deducted automatically.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section section--dark" id="services">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <p class="label label--light">Browse categories</p>
+            <h2>Popular services</h2>
+          </div>
+        </div>
+        <div class="services-scroll" role="list">
+          <div class="service-card" role="listitem"><h3>Web Development</h3><p>Frontend & backend with modern frameworks</p><span>From 20,000 FCFA</span></div>
+          <div class="service-card" role="listitem"><h3>UI/UX Design</h3><p>Wireframes, prototypes & visual systems</p><span>From 15,000 FCFA</span></div>
+          <div class="service-card" role="listitem"><h3>AI & Data Science</h3><p>Models, automation & data pipelines</p><span>From 50,000 FCFA</span></div>
+          <div class="service-card" role="listitem"><h3>Video & Motion</h3><p>Editing, animation & explainer videos</p><span>From 25,000 FCFA</span></div>
+          <div class="service-card" role="listitem"><h3>Writing & Content</h3><p>Copywriting, SEO & technical docs</p><span>From 8,000 FCFA</span></div>
+          <div class="service-card" role="listitem"><h3>Mobile Development</h3><p>Android, iOS & React Native</p><span>From 60,000 FCFA</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Escrow -->
+    <section class="section section--alt" id="escrow">
+      <div class="container">
+        <p class="label">Nkwa Pay escrow</p>
+        <h2>Your money, protected every step</h2>
+        <p class="section__sub">TechConnect never lets funds flow directly between parties. Nkwa Pay holds every payment in escrow until the client confirms the work is done.</p>
+        <ul class="roadmap">
+          <li><span>1</span><div><h3>Client deposits funds</h3><p>Before work begins, the client deposits the milestone amount into our Nkwa Pay escrow account. The job only activates after confirmation.</p></div></li>
+          <li><span>2</span><div><h3>Work & milestone approval</h3><p>The freelancer submits deliverables. The client reviews and approves — or requests changes (max 3 revision rounds per milestone).</p></div></li>
+          <li><span>3</span><div><h3>Funds released on approval</h3><p>On approval, the freelancer receives the amount minus the 10% platform commission. Disputes are frozen and escalated to our admin team.</p></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section section--dark">
+      <div class="container">
+        <p class="label label--light">Real users, real results</p>
+        <h2>What our community says</h2>
+        <div class="testimonials">
+          <figure class="testimonial">
+            <blockquote>TechConnect helped me find a Python developer in two days. The milestone payment gave me complete peace of mind — I only released funds when I was satisfied with each deliverable.</blockquote>
+            <figcaption>
+              <div class="stars">★★★★★</div>
+              <div><strong>Amina B.</strong><br><small>Client · Douala</small></div>
+            </figcaption>
+          </figure>
+          <figure class="testimonial">
+            <blockquote>I've earned over 500,000 FCFA through TechConnect. The rating system brings me real, serious clients every week.</blockquote>
+            <figcaption>
+              <div class="stars">★★★★★</div>
+              <div><strong>Jean‑Marc K.</strong><br><small>Full‑Stack Developer</small></div>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section cta">
+      <div class="container">
+        <h2>Ready to build something real?</h2>
+        <p>Join Cameroon's most trusted freelance marketplace. No installation. No gatekeeping. Just work.</p>
+        <div class="cta__actions">
+          <a href="signup.html" class="btn btn--accent">Create free account</a>
+          <a href="#how-it-works" class="btn btn--ghost">See how it works</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a href="/" class="logo">TechConnect</a>
+        <p>Connecting skills and opportunities in Cameroon. Secure. Simple. Built for Africa.</p>
+      </div>
+      <div class="footer__links">
+        <div><h4>Platform</h4><a href="#">Browse Services</a><a href="#">Post a Job</a><a href="#">How it works</a><a href="#">Pricing</a></div>
+        <div><h4>Company</h4><a href="#">About</a><a href="#">Contact</a><a href="#">Terms</a><a href="#">Privacy</a></div>
+      </div>
+    </div>
+    <div class="footer__bottom container">
+      <p>© 2026 TechConnect. All rights reserved.</p>
+      <div class="socials">
+        <a href="#" aria-label="Twitter"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
+      </div>
+    </div>
+  </footer>
+
+  <button class="fab" id="supportFab" aria-label="Open support">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+  </button>
+  <div class="support-panel" id="supportPanel" aria-hidden="true">
+    <button class="support-panel__close" id="supportClose" aria-label="Close support">×</button>
+    <h3>Help & Support</h3>
+    <ul>
+      <li><a href="faq.html">FAQs</a></li>
+    </ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
