@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechConnect - Freelance Platform</title>
+    <link rel="stylesheet" href="styles-shared.css">
+    <style>
+        /* Dashboard specific styles */
+        .dashboard-hero {
+            background: linear-gradient(135deg, var(--violet) 0%, var(--light-violet) 100%);
+            color: white;
+            padding: 60px 30px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(142, 68, 173, 0.3);
+        }
+
+        .dashboard-hero h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .dashboard-hero p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(142, 68, 173, 0.15);
+            border-color: var(--violet);
+        }
+
+        .feature-card svg {
+            width: 48px;
+            height: 48px;
+            color: var(--violet);
+            flex-shrink: 0;
+        }
+
+        .feature-card h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--deep-gray);
+        }
+
+        .feature-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .feature-card .cta-btn {
+            margin-top: auto;
+            padding: 10px 20px;
+            background: var(--violet);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .feature-card .cta-btn:hover {
+            background: var(--light-violet);
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-hero {
+                padding: 40px 20px;
+            }
+
+            .dashboard-hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>TechConnect</h1>
+            <p>Freelance Project Management Platform</p>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="dashboard-hero">
+            <h2>Manage Your Freelance Projects</h2>
+            <p>Streamline your workflow with our comprehensive project management suite. Accept offers, send proposals,
+                submit work, and review deliverables—all in one place.</p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="feature-grid">
+            <!-- Pending Offers -->
+            <a href="My jobs/my-jobs.html" class="feature-card">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Pending Offers">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <h3>Pending Offers</h3>
+                <p>Review incoming project offers and make accept or decline decisions.</p>
+                <button class="cta-btn">View Offers</button>
+            </a>
+
+            <!-- Send Offer -->
+            <a href="Send Offer/send-offer.html" class="feature-card">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Send Offer">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                    <polyline points="16 6 12 2 8 6"></polyline>
+                    <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+                <h3>Send Job Offer</h3>
+                <p>Create and send professional project proposals with secure escrow payments.</p>
+                <button class="cta-btn">Send Offer</button>
+            </a>
+
+            <!-- Submit Work -->
+            <a href="Submit milestone/submit-milestone.html" class="feature-card">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Submit Work">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+                <h3>Submit Work</h3>
+                <p>Upload completed milestones with detailed descriptions for client review.</p>
+                <button class="cta-btn">Submit Milestone</button>
+            </a>
+
+            <!-- Review Work -->
+            <a href="Review Milestone/review-milestone.html" class="feature-card">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Review Work">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <h3>Review Work</h3>
+                <p>Approve submissions or request revisions with up to 3 revision rounds.</p>
+                <button class="cta-btn">Review Milestones</button>
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

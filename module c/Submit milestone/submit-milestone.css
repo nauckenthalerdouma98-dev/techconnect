@@ -1,0 +1,36 @@
+/* Submit Milestone - Additional Styles */
+
+#submitForm .form-group {
+    margin-bottom: 20px;
+}
+
+.file-label {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.file-label svg {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 10px;
+}
+
+.file-label #fileName {
+    font-weight: 600;
+}
+
+.success-message span {
+    flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .card {
+        padding: 20px;
+    }
+
+    .file-label {
+        padding: 20px 15px;
+    }
+}

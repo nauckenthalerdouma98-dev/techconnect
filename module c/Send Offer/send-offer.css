@@ -1,0 +1,44 @@
+/* Send Offer - Additional Styles */
+
+#offerForm .form-group {
+    margin-bottom: 20px;
+}
+
+.info-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-box p {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+}
+
+.info-box svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.info-box .label {
+    font-weight: 600;
+    color: var(--violet);
+}
+
+#budgetDisplay {
+    color: var(--violet);
+    font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .card {
+        padding: 20px;
+    }
+
+    .btn {
+        font-size: 0.9rem;
+    }
+}
