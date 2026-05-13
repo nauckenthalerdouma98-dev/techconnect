@@ -29,7 +29,7 @@ document.getElementById('offerForm').addEventListener('submit', function (e) {
     const jobSelect = document.getElementById('jobSelect');
     const projectName = jobSelect.options[jobSelect.selectedIndex].text;
 
-    // Create offer object
+    // Create offer object with revision tracking
     const offer = {
         id: Date.now(),
         projectId: selectedJob,
@@ -37,6 +37,7 @@ document.getElementById('offerForm').addEventListener('submit', function (e) {
         price: parseInt(offerPrice),
         note: offerNote,
         status: 'pending',
+        revisionCount: 0,
         createdAt: new Date().toISOString(),
         expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() // 48 hours from now
     };
@@ -46,7 +47,7 @@ document.getElementById('offerForm').addEventListener('submit', function (e) {
     offers.push(offer);
     localStorage.setItem('pendingOffers', JSON.stringify(offers));
 
-    console.log(`Offer Sent for ${selectedJob} at ${offerPrice} FCFA. Status updated to 'Created'. Notification triggered.`);
+    console.log(`Offer Sent for ${selectedJob} at ${offerPrice} FCFA. Status updated to 'Created'. Notification triggered. Revision Count: 0`);
 
     const message = document.getElementById('offerMessage');
     message.classList.add('show');
