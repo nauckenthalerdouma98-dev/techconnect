@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rate & Feedback · TechConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        .rating-container { max-width: 600px; margin: 2rem auto; }
+        .completed-job { background: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .stars { display: flex; gap: 0.5rem; margin: 1rem 0; }
+        .star { font-size: 2rem; cursor: pointer; color: #ccc; transition: color 0.2s; }
+        .star.selected, .star:hover { color: var(--violet); }
+        .rating-text { margin: 0.5rem 0; }
+    </style>
+</head>
+<body>
+    <div class="notification-container" id="notificationContainer"></div>
+    <header class="header">
+        <div class="header__inner">
+            <a href="../Module%202/home.html" class="logo">TechConnect</a>
+            <nav class="nav">
+                <a href="../Module%202/home.html">Home</a>
+                <a href="../Module%202/dashboard.html">Browse</a>
+                <a href="../Module%202/post-job.html">Post Job</a>
+                <a href="../Module%201/Feature%203%20-%20Profile.html">Profile</a>
+                <a href="#" id="signOutLink">Sign out</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="rating-container">
+            <h2>Rate Completed Jobs</h2>
+            <div id="completedJobsList"></div>
+        </div>
+    </div>
+    <script>
+        function showNotification(msg, type) { /* same as before */ }
+        function getCurrentUser() { return JSON.parse(localStorage.getItem('techconnect_current_user')); }
+        function getJobs() { return JSON.parse(localStorage.getItem('techconnect_jobs')) || []; }
+        function getRatings() { return JSON.parse(localStorage.getItem('techconnect_ratings')) || []; }
+        function saveRatings(ratings) { localStorage.setItem('techconnect_ratings', JSON.stringify(ratings)); }
+        function getProfiles() { return JSON.parse(localStorage.getItem('techconnect_profiles')) || {}; }
+        function saveProfiles(profiles) { localStorage.setItem('techconnect_profiles', JSON.stringify(profiles)); }
+        function getUsers() { return JSON.parse(localStorage.getItem('techconnect_users')) || []; }
+
+        function renderStars(container, rating, onChange) {
+            container.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.className = 'star';
+                star.textContent = '★';
+                if (i <= rating) star.classList.add('selected');
+                star.addEventListener('click', () => onChange(i));
+                container.appendChild(star);
+            }
+        }
+
+        function loadCompletedJobs() {
+            const user = getCurrentUser();
+            if (!user) { window.location.href = '../Module%201/Feature%202%20-%20Login.html'; return; }
+            const jobs = getJobs().filter(j => j.status === 'completed' && (j.clientId === user.uid || j.skilledUserID === user.uid));
+            const ratings = getRatings();
+            const existingRatingKeys = ratings.map(r => `${r.jobId}_${r.fromUserId}`);
+            const pendingJobs = jobs.filter(job => !existingRatingKeys.includes(`${job.id}_${user.uid}`));
+            const container = document.getElementById('completedJobsList');
+            if (pendingJobs.length === 0) {
+                container.innerHTML = '<div class="empty-state">No pending ratings. All completed jobs have been rated.</div>';
+                return;
+            }
+            container.innerHTML = pendingJobs.map(job => {
+                const otherUserId = (job.clientId === user.uid) ? job.skilledUserID : job.clientId;
+                const otherProfile = getProfiles()[otherUserId] || {};
+                const otherUser = getUsers().find(u => u.uid === otherUserId) || {};
+                return `
+                    <div class="completed-job" data-jobid="${job.id}" data-otheruser="${otherUserId}">
+                        <h3>${escapeHtml(job.title)}</h3>
+                        <p>Rate ${escapeHtml(otherProfile.name || otherUser.email || 'user')}</p>
+                        <div class="stars" id="stars-${job.id}"></div>
+                        <div class="rating-text" id="ratingText-${job.id}">Select rating</div>
+                        <textarea id="comment-${job.id}" rows="3" placeholder="Leave a comment (optional)"></textarea>
+                        <button class="btn btn--accent submit-rating" data-jobid="${job.id}" data-otheruser="${otherUserId}" style="margin-top:1rem;">Submit Rating</button>
+                    </div>
+                `;
+            }).join('');
+            // Attach star rating logic
+            pendingJobs.forEach(job => {
+                let currentRating = 0;
+                const starsContainer = document.getElementById(`stars-${job.id}`);
+                const ratingText = document.getElementById(`ratingText-${job.id}`);
+                renderStars(starsContainer, currentRating, (val) => {
+                    currentRating = val;
+                    renderStars(starsContainer, currentRating, (v) => currentRating = v);
+                    ratingText.textContent = `Rating: ${currentRating} star${currentRating !== 1 ? 's' : ''}`;
+                });
+                const submitBtn = document.querySelector(`.submit-rating[data-jobid="${job.id}"]`);
+                submitBtn.addEventListener('click', () => {
+                    if (currentRating === 0) {
+                        showNotification('Please select a rating.', 'error');
+                        return;
+                    }
+                    const comment = document.getElementById(`comment-${job.id}`).value.trim();
+                    const ratings = getRatings();
+                    ratings.push({
+                        id: Date.now(),
+                        jobId: job.id,
+                        fromUserId: user.uid,
+                        toUserId: job.clientId === user.uid ? job.skilledUserID : job.clientId,
+                        score: currentRating,
+                        comment: comment,
+                        date: new Date().toISOString()
+                    });
+                    saveRatings(ratings);
+                    // Update aggregate rating of the target user
+                    const targetUserId = job.clientId === user.uid ? job.skilledUserID : job.clientId;
+                    const allRatingsForTarget = ratings.filter(r => r.toUserId === targetUserId);
+                    const avg = allRatingsForTarget.reduce((sum, r) => sum + r.score, 0) / allRatingsForTarget.length;
+                    const profiles = getProfiles();
+                    if (!profiles[targetUserId]) profiles[targetUserId] = {};
+                    profiles[targetUserId].rating = avg;
+                    saveProfiles(profiles);
+                    showNotification('Rating submitted! Thank you for your feedback.', 'success');
+                    loadCompletedJobs(); // refresh
+                });
+            });
+        }
+
+        document.getElementById('signOutLink').addEventListener('click', () => {
+            localStorage.removeItem('techconnect_current_user');
+            window.location.href = '../index.html';
+        });
+        document.addEventListener('DOMContentLoaded', loadCompletedJobs);
+        function escapeHtml(str) { return str?.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])) || ''; }
+    </script>
+</body>
+</html>
