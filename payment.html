@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Make Payment · TechConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../common.css">
+  <style>
+    .payment-card { max-width: 600px; margin: 2rem auto; }
+    .payment-summary { background: var(--soft-white-muted); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-subtle); }
+    .summary-row.total { font-weight: 700; color: var(--violet); border-bottom: none; }
+    .radio-group { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+    .radio-group label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="notification-container" id="notificationContainer"></div>
+  <header class="header">
+    <div class="header__inner">
+      <a href="../Module%202/home.html" class="logo">TechConnect</a>
+      <nav class="nav">
+        <a href="../Module%202/home.html">Home</a>
+        <a href="../Module%202/dashboard.html">Browse</a>
+        <a href="../Module%202/post-job.html">Post Job</a>
+        <a href="../Module%201/Feature%203%20-%20Profile.html">Profile</a>
+        <a href="#" id="signOutLink">Sign out</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="payment-card auth-card">
+      <h2>Nkwa Pay – Secure Payment</h2>
+      <div id="paymentDetails" class="payment-summary">
+        <!-- dynamic summary -->
+      </div>
+
+      <form id="paymentForm">
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="paymentType" value="full" checked> Pay full amount upfront
+          </label>
+          <label>
+            <input type="radio" name="paymentType" value="milestone"> Pay this milestone only
+          </label>
+        </div>
+
+        <div class="field">
+          <label>Mobile Money / Card Number</label>
+          <input type="text" id="accountNumber" placeholder="Enter your payment account" required>
+        </div>
+        <div class="field">
+          <label>Provider</label>
+          <select id="provider" style="width:100%; padding:0.75rem; border-radius:12px; border:1px solid var(--border-subtle);">
+            <option value="mtn">MTN Mobile Money</option>
+            <option value="orange">Orange Money</option>
+            <option value="visa">Visa / Mastercard</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn--accent" style="width:100%;">Pay Now</button>
+      </form>
+      <div class="divider" style="margin:1.5rem 0;"></div>
+      <div class="ssl" style="text-align:center; font-size:0.8rem; color:var(--text-muted);">
+        SSL Secured Payment – Powered by Nkwa Pay
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showNotification(msg, type, duration) {
+      const container = document.getElementById('notificationContainer');
+      if (!container) return;
+      const notif = document.createElement('div');
+      notif.className = `notification ${type}`;
+      notif.textContent = msg;
+      container.appendChild(notif);
+      setTimeout(() => {
+        notif.classList.add('hide');
+        notif.addEventListener('animationend', () => notif.remove());
+      }, duration || 4000);
+    }
+
+    function getCurrentUser() { return JSON.parse(localStorage.getItem('techconnect_current_user')); }
+    function getJobs() { return JSON.parse(localStorage.getItem('techconnect_jobs')) || []; }
+    function getPayments() { return JSON.parse(localStorage.getItem('techconnect_payments')) || []; }
+    function savePayments(payments) { localStorage.setItem('techconnect_payments', JSON.stringify(payments)); }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const jobId = urlParams.get('jobId');
+    const milestoneId = urlParams.get('milestoneId'); // optional, if paying per milestone
+
+    let job = null;
+    let baseAmount = 0;
+    let commission = 0;
+    let totalAmount = 0;
+
+    function loadPaymentDetails() {
+      const user = getCurrentUser();
+      if (!user) { window.location.href = '../Module%201/Feature%202%20-%20Login.html'; return; }
+      if (!jobId) { document.getElementById('paymentDetails').innerHTML = '<p>No job specified.</p>'; return; }
+      const jobs = getJobs();
+      job = jobs.find(j => j.id === jobId);
+      if (!job) { document.getElementById('paymentDetails').innerHTML = '<p>Job not found.</p>'; return; }
+      if (milestoneId) {
+        const idx = parseInt(milestoneId);
+        const milestone = job.milestones[idx];
+        if (milestone) baseAmount = milestone.amount;
+        else baseAmount = job.budget;
+      } else {
+        baseAmount = job.budget;
+      }
+      commission = baseAmount * 0.1;
+      totalAmount = baseAmount + commission;
+      document.getElementById('paymentDetails').innerHTML = `
+        <div class="summary-row"><span>Job:</span><strong>${escapeHtml(job.title)}</strong></div>
+        ${milestoneId ? `<div class="summary-row"><span>Milestone:</span><strong>${escapeHtml(job.milestones[parseInt(milestoneId)]?.description || 'Milestone')}</strong></div>` : ''}
+        <div class="summary-row"><span>Amount:</span>${formatCurrency(baseAmount)}</div>
+        <div class="summary-row"><span>Platform commission (10%):</span>${formatCurrency(commission)}</div>
+        <div class="summary-row total"><span>Total to pay:</span><strong>${formatCurrency(totalAmount)}</strong></div>
+      `;
+    }
+
+    function formatCurrency(amt) { return amt.toLocaleString() + ' FCFA'; }
+    function escapeHtml(str) { return str?.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])) || ''; }
+
+    document.getElementById('paymentForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const user = getCurrentUser();
+      if (!user || user.role !== 'client') {
+        showNotification('Only clients can make payments.', 'error');
+        return;
+      }
+      const account = document.getElementById('accountNumber').value.trim();
+      const provider = document.getElementById('provider').value;
+      if (!account) {
+        showNotification('Please enter your payment account number.', 'error');
+        return;
+      }
+
+      const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
+      let amountToPay = baseAmount;
+      if (paymentType === 'full') amountToPay = job.budget;
+      else amountToPay = baseAmount; // milestone amount
+
+      // Simulate Nkwa Pay transaction
+      const transactionId = 'NKW' + Date.now() + Math.floor(Math.random() * 10000);
+      const paymentRecord = {
+        id: transactionId,
+        jobId: job.id,
+        milestoneId: milestoneId || null,
+        amount: amountToPay,
+        commission: amountToPay * 0.1,
+        totalPaid: amountToPay * 1.1,
+        clientId: user.uid,
+        status: 'confirmed',
+        paymentMethod: paymentType,
+        provider: provider,
+        accountNumber: account.substring(0,4) + '****',
+        timestamp: new Date().toISOString()
+      };
+      const payments = getPayments();
+      payments.push(paymentRecord);
+      savePayments(payments);
+
+      // Update job status if this is the first payment (full upfront)
+      const jobs = getJobs();
+      const jobIndex = jobs.findIndex(j => j.id === job.id);
+      if (jobIndex !== -1 && jobs[jobIndex].status === 'created') {
+        jobs[jobIndex].status = 'active';
+        localStorage.setItem('techconnect_jobs', JSON.stringify(jobs));
+      }
+
+      // Redirect to confirmation page
+      window.location.href = `payment-confirmation.html?status=success&transactionId=${transactionId}&amount=${amountToPay}`;
+    });
+
+    document.getElementById('signOutLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('techconnect_current_user');
+      window.location.href = '../index.html';
+    });
+
+    loadPaymentDetails();
+  </script>
+</body>
+</html>
