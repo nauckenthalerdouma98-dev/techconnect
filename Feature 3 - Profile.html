@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Profile – TechConnect</title>
+  <meta name="description" content="Edit your TechConnect profile." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <style>
+    /* ========== EXACT profile.css ========== */
+    :root {
+      --deep-gray: #1E1E1E;
+      --violet: #8E44AD;
+      --soft-white: #EAEAEA;
+      --light-bg: #F5F5F7;
+      --transition: 0.25s ease;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--soft-white);
+      color: var(--deep-gray);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+    }
+
+    .notification-container {
+      position: fixed;
+      top: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      width: 90%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .notification {
+      padding: 1rem 1.2rem;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      opacity: 0;
+      transform: translateY(-30px);
+      animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    .notification.success {
+      background: #2ecc71;
+      border-left: 4px solid #27ae60;
+    }
+
+    .notification.error {
+      background: #e74c3c;
+      border-left: 4px solid #c0392b;
+    }
+
+    .notification.info {
+      background: var(--violet);
+      border-left: 4px solid #6a2f82;
+    }
+
+    .notification.hide {
+      animation: fadeOut 0.3s ease forwards;
+    }
+
+    @keyframes slideIn {
+      0% {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeOut {
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+    }
+
+    .loading-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--deep-gray);
+      color: var(--soft-white);
+      padding: 0.8rem 2rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .loading-bar.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .loading-bar__spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid var(--violet);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .profile-page {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .profile-card {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-radius: 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      aspect-ratio: 9 / 16;
+      max-height: 90vh;
+      position: relative;
+    }
+
+    .card-header {
+      padding: 2rem 1.5rem 0;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      margin: 0 auto 1rem;
+      width: 96px;
+      height: 96px;
+    }
+
+    .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid var(--violet);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-upload {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: var(--violet);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      transition: background var(--transition);
+    }
+
+    .avatar-upload:hover {
+      background: #7a39a0;
+    }
+
+    .user-name {
+      font-size: 1.6rem;
+      color: var(--deep-gray);
+      margin-bottom: 0.25rem;
+      word-break: break-word;
+    }
+
+    .user-email {
+      font-size: 0.9rem;
+      color: #777;
+      margin-bottom: 1.2rem;
+      word-break: break-word;
+    }
+
+    .divider-line {
+      border: none;
+      height: 1px;
+      background: rgba(142, 68, 173, 0.15);
+      margin: 0 0.5rem;
+    }
+
+    .card-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--deep-gray);
+      margin-bottom: 0.3rem;
+    }
+
+    .field input,
+    .field textarea {
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.8rem 0.9rem;
+      background: var(--light-bg);
+      border: none;
+      border-bottom: 1px solid #d0d0d0;
+      border-radius: 8px 8px 0 0;
+      transition: border-color var(--transition), background var(--transition);
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-bottom-color: var(--violet);
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(142, 68, 173, 0.08);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    .row-fields {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .half {
+      flex: 1;
+    }
+
+    .skill-selector {
+      position: relative;
+    }
+
+    .skills-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-chip {
+      background: rgba(142, 68, 173, 0.1);
+      color: var(--violet);
+      border-radius: 999px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .skill-chip button {
+      background: none;
+      border: none;
+      color: var(--violet);
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 0.2rem;
+    }
+
+    #skillInput {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #d0d0d0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: var(--light-bg);
+    }
+
+    #skillInput:focus {
+      outline: none;
+      border-color: var(--violet);
+    }
+
+    .skill-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      max-height: 150px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .skill-suggestions div {
+      padding: 0.5rem 0.8rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .skill-suggestions div:hover {
+      background: rgba(142, 68, 173, 0.05);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .freelancer-only,
+    .client-only {
+      transition: none;
+    }
+
+    .validate-btn {
+      align-self: flex-end;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--violet);
+      color: #fff;
+      border: none;
+      border-radius: 40px;
+      padding: 0.8rem 1.8rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background var(--transition), box-shadow var(--transition);
+      margin-top: 0.5rem;
+      box-shadow: 0 4px 12px rgba(142, 68, 173, 0.25);
+    }
+
+    .validate-btn:hover {
+      background: #7a39a0;
+      box-shadow: 0 6px 18px rgba(142, 68, 173, 0.35);
+    }
+
+    @media (max-width: 500px) {
+      .profile-card {
+        aspect-ratio: auto;
+        max-height: none;
+        border-radius: 20px;
+      }
+
+      .card-body {
+        padding: 1rem;
+      }
+    }
+
+    .role-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.5rem;
+      background: rgba(142, 68, 173, 0.06);
+      border-bottom: 1px solid rgba(142, 68, 173, 0.1);
+      font-size: 0.85rem;
+      color: var(--deep-gray);
+    }
+
+    .sign-out-link {
+      color: var(--violet);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .sign-out-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="notification-container" id="notificationContainer"></div>
+  <div class="loading-bar" id="loadingBar">
+    <div class="loading-bar__spinner"></div>
+    <span>Processing…</span>
+  </div>
+
+  <main class="profile-page">
+    <div class="profile-card">
+      <div class="role-badge" id="roleBadge">
+        <span id="roleLabel">You are logged in as <strong>Skilled</strong></span>
+        <a href="#" class="sign-out-link" id="signOutLink">Sign out</a>
+      </div>
+      <section class="card-header">
+        <div class="avatar-wrapper">
+          <div class="avatar" id="avatarPreview">
+            <img id="avatarImg" src="" alt="Profile picture" />
+          </div>
+          <label class="avatar-upload" aria-label="Change profile picture">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" x2="12" y1="15" y2="3" />
+            </svg>
+            <input type="file" id="profilePictureInput" accept="image/*" hidden />
+          </label>
+        </div>
+        <h2 id="displayName" class="user-name">Your Name</h2>
+        <p id="displayEmail" class="user-email">email@example.com</p>
+        <div class="rating-info" style="margin: 0.5rem 0;">
+          <span id="userRating">Rating: N/A</span>
+          <span id="topRatedBadge" class="badge"
+            style="display:none; background:gold; color:#333; padding:0.2rem 0.5rem; border-radius:20px; margin-left:0.5rem;">Top
+            Rated</span>
+        </div>
+        <hr class="divider-line" />
+      </section>
+
+      <form id="profileForm" class="card-body" novalidate>
+        <div class="field"><label for="fullName">Full name</label><input type="text" id="fullName"
+            placeholder="Your full name" autocomplete="name" required /></div>
+        <div class="field"><label for="mobile">Mobile number</label><input type="tel" id="mobile"
+            placeholder="+237 6XX XXX XXX" /></div>
+        <div class="field"><label for="education">Education</label><input type="text" id="education"
+            placeholder="e.g. BSc Computer Science" /></div>
+        <div class="row-fields">
+          <div class="field half"><label for="country">Country</label><input type="text" id="country"
+              placeholder="Cameroon" /></div>
+          <div class="field half"><label for="state">State / Region</label><input type="text" id="state"
+              placeholder="Centre" /></div>
+        </div>
+        <div class="field"><label for="address1">Address line 1</label><input type="text" id="address1"
+            placeholder="Street, district" /></div>
+        <div class="field"><label for="address2">Address line 2 (optional)</label><input type="text" id="address2"
+            placeholder="Apartment, suite, etc." /></div>
+        <div class="field"><label for="bio">Short bio</label><textarea id="bio" rows="3"
+            placeholder="Tell others about your expertise or needs"></textarea></div>
+
+        <div class="field freelancer-only" id="skillsField">
+          <label>Skills</label>
+          <div class="skill-selector" id="skillSelectorContainer"></div>
+        </div>
+        <div class="field freelancer-only" id="experienceField">
+          <label for="experience">Experience in designing / development</label>
+          <textarea id="experience" rows="3" placeholder="Describe your relevant experience"></textarea>
+        </div>
+        <div class="field client-only hidden" id="clientCompanyField">
+          <label for="companyName">Company or organisation</label>
+          <input type="text" id="companyName" placeholder="Your company (optional)" />
+        </div>
+        <div class="field client-only hidden" id="clientDescField">
+          <label for="clientDesc">Typical projects you hire for</label>
+          <textarea id="clientDesc" rows="3" placeholder="Describe the type of work you need"></textarea>
+        </div>
+
+        <button type="submit" class="validate-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Save profile
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // ========== Skill Selector Component (offline) ==========
+    const SkillSelector = (function () {
+      const predefinedSkills = ["Python", "JavaScript", "React", "Node.js", "UI/UX Design", "Logo Design", "Content Writing", "Video Editing", "Social Media", "Mobile Development", "Data Science", "Graphic Design"];
+      let selectedSkills = [];
+      let container = null;
+      let onSkillsChangeCallback = null;
+
+      function renderSkills() {
+        if (!container) return;
+        const display = container.querySelector(".skills-display");
+        if (!display) return;
+        display.innerHTML = selectedSkills.map(skill => `<span class="skill-chip">${skill} <button type="button" data-skill="${skill}">×</button></span>`).join("");
+        display.querySelectorAll("button").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const skill = btn.getAttribute("data-skill");
+            selectedSkills = selectedSkills.filter(s => s !== skill);
+            renderSkills();
+            if (onSkillsChangeCallback) onSkillsChangeCallback(selectedSkills);
+          });
+        });
+      }
+
+      function init(containerElement, onSkillsChange) {
+        container = containerElement;
+        onSkillsChangeCallback = onSkillsChange || null;
+        container.innerHTML = '<div class="skills-display"></div><input type="text" id="skillInput" placeholder="Add a skill (e.g. Python)" autocomplete="off"><div class="skill-suggestions"></div>';
+        const input = container.querySelector("#skillInput");
+        const suggestions = container.querySelector(".skill-suggestions");
+        input.addEventListener("input", () => {
+          const query = input.value.toLowerCase().trim();
+          const filtered = predefinedSkills.filter(s => s.toLowerCase().includes(query) && !selectedSkills.includes(s));
+          suggestions.innerHTML = filtered.map(s => `<div>${s}</div>`).join("");
+          suggestions.style.display = filtered.length ? "block" : "none";
+        });
+        suggestions.addEventListener("click", (e) => {
+          if (e.target.tagName === "DIV") {
+            const skill = e.target.textContent;
+            if (!selectedSkills.includes(skill)) {
+              selectedSkills.push(skill);
+              renderSkills();
+              input.value = "";
+              suggestions.style.display = "none";
+              if (onSkillsChangeCallback) onSkillsChangeCallback(selectedSkills);
+            }
+          }
+        });
+        input.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const customSkill = input.value.trim();
+            if (customSkill && !selectedSkills.includes(customSkill)) {
+              selectedSkills.push(customSkill);
+              renderSkills();
+              input.value = "";
+              suggestions.style.display = "none";
+              if (onSkillsChangeCallback) onSkillsChangeCallback(selectedSkills);
+            }
+          }
+        });
+        document.addEventListener("click", (e) => {
+          if (!container.contains(e.target)) suggestions.style.display = "none";
+        });
+        renderSkills();
+      }
+
+      function setSkills(skills) {
+        selectedSkills = skills || [];
+        renderSkills();
+      }
+
+      function getSkills() {
+        return [...selectedSkills];
+      }
+
+      return { init, setSkills, getSkills };
+    })();
+
+    // UI Helpers
+    function showNotification(message, type = "info", duration = 4000) {
+      const container = document.getElementById("notificationContainer");
+      if (!container) return;
+      const notif = document.createElement("div");
+      notif.className = `notification ${type}`;
+      notif.textContent = message;
+      container.appendChild(notif);
+      setTimeout(() => {
+        notif.classList.add("hide");
+        notif.addEventListener("animationend", () => notif.remove());
+      }, duration);
+    }
+
+    function showLoading() { document.getElementById("loadingBar").classList.add("show"); }
+    function hideLoading() { document.getElementById("loadingBar").classList.remove("show"); }
+
+    // Auth guard: redirect if not logged in
+    const currentUser = JSON.parse(localStorage.getItem("techconnect_current_user"));
+    if (!currentUser) {
+      window.location.href = "Feature%202%20-%20Login.html";
+    }
+
+    // Load profile data
+    const profiles = JSON.parse(localStorage.getItem("techconnect_profiles")) || {};
+    let profile = profiles[currentUser.uid] || {};
+
+    // Set header
+    document.getElementById("displayName").innerText = profile.name || "Your Name";
+    document.getElementById("displayEmail").innerText = currentUser.email;
+    document.getElementById("roleLabel").innerHTML = `You are logged in as <strong>${currentUser.role === "skilled" ? "Skilled" : "Client"}</strong>`;
+
+    if (profile.profileImageURL) document.getElementById("avatarImg").src = profile.profileImageURL;
+
+    const ratingData = getUserRating(user.uid);
+    if (ratingData) {
+      document.getElementById('userRating').innerText = `Rating: ${ratingData.avg.toFixed(1)} / 5 (${ratingData.count} reviews)`;
+      if (ratingData.avg >= 4.5 && ratingData.count >= 10) {
+        document.getElementById('topRatedBadge').style.display = 'inline-block';
+      }
+    } else {
+      document.getElementById('userRating').innerText = 'Rating: Not rated yet';
+    }
+
+    // Populate form fields
+    document.getElementById("fullName").value = profile.name || "";
+    document.getElementById("mobile").value = profile.mobile || "";
+    document.getElementById("education").value = profile.education || "";
+    document.getElementById("country").value = profile.country || "";
+    document.getElementById("state").value = profile.state || "";
+    document.getElementById("address1").value = profile.address1 || "";
+    document.getElementById("address2").value = profile.address2 || "";
+    document.getElementById("bio").value = profile.bio || "";
+
+    // Role-specific fields
+    if (currentUser.role === "skilled") {
+      document.querySelectorAll(".freelancer-only").forEach(el => el.classList.remove("hidden"));
+      document.querySelectorAll(".client-only").forEach(el => el.classList.add("hidden"));
+      document.getElementById("experience").value = profile.experience || "";
+      SkillSelector.init(document.getElementById("skillSelectorContainer"));
+      SkillSelector.setSkills(profile.skills || []);
+    } else {
+      document.querySelectorAll(".freelancer-only").forEach(el => el.classList.add("hidden"));
+      document.querySelectorAll(".client-only").forEach(el => el.classList.remove("hidden"));
+      document.getElementById("companyName").value = profile.companyName || "";
+      document.getElementById("clientDesc").value = profile.clientDesc || "";
+    }
+
+    // Avatar upload preview
+    document.getElementById("profilePictureInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById("avatarImg").src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function getUserRating(uid) {
+      const ratings = JSON.parse(localStorage.getItem('techconnect_ratings')) || [];
+      const received = ratings.filter(r => r.toUserId === uid);
+      if (received.length === 0) return null;
+      const avg = received.reduce((s, r) => s + r.score, 0) / received.length;
+      return { avg, count: received.length };
+    }
+
+    // Save profile
+    document.getElementById("profileForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      showLoading();
+
+      const updatedProfile = {
+        name: document.getElementById("fullName").value.trim(),
+        mobile: document.getElementById("mobile").value.trim(),
+        education: document.getElementById("education").value.trim(),
+        country: document.getElementById("country").value.trim(),
+        state: document.getElementById("state").value.trim(),
+        address1: document.getElementById("address1").value.trim(),
+        address2: document.getElementById("address2").value.trim(),
+        bio: document.getElementById("bio").value.trim(),
+      };
+
+      if (currentUser.role === "skilled") {
+        updatedProfile.skills = SkillSelector.getSkills();
+        updatedProfile.experience = document.getElementById("experience").value.trim();
+      } else {
+        updatedProfile.companyName = document.getElementById("companyName").value.trim();
+        updatedProfile.clientDesc = document.getElementById("clientDesc").value.trim();
+      }
+
+      const file = document.getElementById("profilePictureInput").files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          updatedProfile.profileImageURL = ev.target.result;
+          saveProfile(updatedProfile);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        saveProfile(updatedProfile);
+      }
+    });
+
+    function saveProfile(updated) {
+      profiles[currentUser.uid] = { ...profiles[currentUser.uid], ...updated, email: currentUser.email, role: currentUser.role };
+      localStorage.setItem("techconnect_profiles", JSON.stringify(profiles));
+      showNotification("Profile updated successfully!", "success");
+      setTimeout(() => {
+        window.location.href = "../Module%202/home.html";
+      }, 1000);
+      hideLoading();
+    }
+
+    // Sign out
+    document.getElementById("signOutLink").addEventListener("click", (e) => {
+      e.preventDefault();
+      localStorage.removeItem("techconnect_current_user");
+      window.location.href = "../index.html";
+    });
+  </script>
+</body>
+
+</html>
