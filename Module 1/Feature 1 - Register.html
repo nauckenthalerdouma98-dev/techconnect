@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up – TechConnect</title>
+  <meta name="description" content="Create your TechConnect account as a skilled freelancer or client." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ========== EXACT register.css content ========== */
+    :root {
+      --deep-gray: #1E1E1E;
+      --violet: #8E44AD;
+      --soft-white: #EAEAEA;
+      --transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--soft-white);
+      color: var(--deep-gray);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    /* Custom Notifications */
+    .notification-container {
+      position: fixed;
+      top: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      width: 90%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .notification {
+      padding: 1rem 1.2rem;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      opacity: 0;
+      transform: translateY(-30px);
+      animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .notification.success { background: #2ecc71; border-left: 4px solid #27ae60; }
+    .notification.error { background: #e74c3c; border-left: 4px solid #c0392b; }
+    .notification.info { background: var(--violet); border-left: 4px solid #6a2f82; }
+    .notification.hide { animation: fadeOut 0.3s ease forwards; }
+    @keyframes slideIn {
+      0% { opacity: 0; transform: translateY(-30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); }
+    }
+
+    /* Auth container */
+    .auth-container {
+      width: 100%;
+      max-width: 860px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+      overflow: hidden;
+      min-height: 520px;
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+    .step-indicator .step {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: #777;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .step-indicator .step.active { background: var(--violet); color: #fff; }
+    .step-indicator .step.completed { background: #d5b3e6; color: #fff; }
+
+    .split-wrapper {
+      display: flex;
+      min-height: 440px;
+      position: relative;
+    }
+
+    .form-side, .info-side {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+      transition: transform var(--transition);
+    }
+    .form-side { background: #fff; overflow-y: auto; }
+    .info-side {
+      background: linear-gradient(135deg, var(--deep-gray) 0%, #2d1b4a 100%);
+      color: var(--soft-white);
+    }
+
+    .split-wrapper.swapped .form-side { transform: translateX(100%); }
+    .split-wrapper.swapped .info-side { transform: translateX(-100%); }
+
+    .form-content { max-width: 360px; margin: 0 auto; width: 100%; }
+
+    .back-link { margin-bottom: 1.5rem; }
+    .back-link a {
+      font-size: 0.85rem;
+      color: #777;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: color var(--transition);
+    }
+    .back-link a:hover { color: var(--violet); }
+
+    h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .form-sub { font-size: 0.9rem; color: #666; margin-bottom: 2rem; }
+
+    .field { margin-bottom: 1.2rem; }
+    .field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--deep-gray); }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color var(--transition);
+    }
+    .field input:focus, .field textarea:focus {
+      outline: none;
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px rgba(142,68,173,0.15);
+    }
+    .password-wrapper { position: relative; }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #777;
+      cursor: pointer;
+    }
+    .toggle-password:hover { color: var(--violet); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.9rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all var(--transition);
+    }
+    .btn--accent { background: var(--violet); color: #fff; border-color: var(--violet); }
+    .btn--accent:hover { background: #7a39a0; box-shadow: 0 8px 20px rgba(142,68,173,0.3); }
+    .btn--outline { background: transparent; color: var(--deep-gray); border: 1px solid #ccc; }
+    .btn--outline:hover { border-color: var(--violet); color: var(--violet); }
+    .btn--ghost { background: transparent; border: 1px solid #ccc; color: var(--deep-gray); }
+    .btn--ghost:hover { border-color: var(--violet); color: var(--violet); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      color: #aaa;
+      font-size: 0.8rem;
+    }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #ddd; }
+
+    .switch-role { text-align: center; margin-top: 1.5rem; }
+    .switch-btn {
+      background: none;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--violet);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: all var(--transition);
+    }
+    .switch-btn:hover { color: #7a39a0; }
+
+    .step-content.hidden { display: none; }
+
+    /* Skill selector */
+    .skill-selector { position: relative; }
+    .skills-display { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .skill-chip {
+      background: rgba(142,68,173,0.1);
+      color: var(--violet);
+      border-radius: 999px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .skill-chip button { background: none; border: none; color: var(--violet); cursor: pointer; font-weight: bold; margin-left: 0.2rem; }
+    #skillInput {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .skill-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      max-height: 150px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+    .skill-suggestions div { padding: 0.5rem 0.8rem; cursor: pointer; font-size: 0.85rem; }
+    .skill-suggestions div:hover { background: rgba(142,68,173,0.05); }
+
+    /* Step 3 */
+    .email-verify { text-align: center; }
+    .email-verify svg { margin-bottom: 1.5rem; }
+    .email-verify p { margin-bottom: 1.5rem; line-height: 1.7; color: #444; }
+    .small-note { font-size: 0.85rem; color: #666; margin-top: 1rem; }
+    .link-btn { background: none; border: none; color: var(--violet); font-weight: 600; cursor: pointer; font-size: inherit; }
+    .link-btn:hover { text-decoration: underline; }
+
+    .terms-box { margin: 1.5rem 0; text-align: left; }
+    .checkbox-label { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; font-size: 0.9rem; }
+    .checkbox-label input { width: auto; }
+    .link-terms { color: var(--violet); font-weight: 600; }
+
+    .step-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+    .step-actions .btn { flex: 1; }
+
+    .info-content { text-align: center; }
+    .info-icon { margin-bottom: 2rem; }
+    .info-side h1 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 2rem; margin-bottom: 1rem; }
+    .info-side p { font-size: 0.9rem; line-height: 1.7; color: #ccc; max-width: 280px; margin: 0 auto; }
+
+    .auth-footer { text-align: center; padding: 1.5rem; border-top: 1px solid #eee; font-size: 0.85rem; }
+    .auth-footer a { color: var(--violet); font-weight: 600; }
+
+    @media (max-width: 768px) {
+      .auth-container { min-height: auto; }
+      .split-wrapper { flex-direction: column; min-height: auto; }
+      .form-side, .info-side { width: 100%; padding: 2rem 1.5rem; }
+      .info-side { padding: 2rem 1.5rem; }
+      .split-wrapper.swapped .form-side,
+      .split-wrapper.swapped .info-side { transform: none; }
+      .split-wrapper.swapped .form-side { order: 2; }
+      .split-wrapper.swapped .info-side { order: 1; }
+      .form-content { max-width: 100%; }
+    }
+
+    .loading-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--deep-gray);
+      color: var(--soft-white);
+      padding: 0.8rem 2rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .loading-bar.show { opacity: 1; pointer-events: auto; }
+    .loading-bar__spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top: 2px solid var(--violet);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="notification-container" id="notificationContainer"></div>
+  <div class="loading-bar" id="loadingBar">
+    <div class="loading-bar__spinner"></div>
+    <span>Processing…</span>
+  </div>
+
+  <div class="auth-container">
+    <div class="step-indicator" id="stepIndicator">
+      <span class="step active" data-step="1">1</span>
+      <span class="step" data-step="2">2</span>
+      <span class="step" data-step="3">3</span>
+    </div>
+
+    <div class="split-wrapper" id="splitWrapper">
+      <div class="form-side" id="formSide">
+        <div class="form-content">
+          <div class="back-link">
+            <a href="../index.html">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Back home
+            </a>
+          </div>
+
+          <!-- STEP 1 -->
+          <div class="step-content" id="step1Content">
+            <h2>Create your account</h2>
+            <p class="form-sub">Step 1 of 3 · Basic credentials</p>
+            <form id="step1Form" novalidate>
+              <div class="field">
+                <label for="regEmail">Email address</label>
+                <input type="email" id="regEmail" placeholder="name@example.com" required autocomplete="email" />
+              </div>
+              <div class="field">
+                <label for="regPassword">Password</label>
+                <div class="password-wrapper">
+                  <input type="password" id="regPassword" placeholder="Minimum 8 characters" minlength="8" required autocomplete="new-password" />
+                  <button type="button" class="toggle-password" aria-label="Show password">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
+              </div>
+              <button type="submit" class="btn btn--accent" id="step1Next">
+                <span class="btn-text">Register as <span id="roleLabel">Freelancer</span></span>
+              </button>
+              <div class="divider"><span>or continue with</span></div>
+              <button type="button" class="btn btn--outline" id="googleRegisterBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 3.8C16.6 2.4 14.5 1.5 12 1.5 6.5 1.5 2 6 2 11.5S6.5 21.5 12 21.5c2.9 0 5.5-1.1 7.5-3.1l-2.9-2.2c-.8.7-1.9 1.1-3.1 1.1-2.5 0-4.5-2-4.5-4.5s2-4.5 4.5-4.5c1.2 0 2.4.5 3.3 1.4l-1.3 1.3h4.1V6.2c-1.2-1-2.6-2.4-4.4-2.4z"/></svg>
+                Sign up with Google
+              </button>
+            </form>
+            <p class="switch-role">
+              <button type="button" id="switchRoleBtn" class="switch-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7"/></svg>
+                Switch to <span id="switchLabel">Client</span>
+              </button>
+            </p>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="step-content hidden" id="step2Content">
+            <h2>Tell us about yourself</h2>
+            <p class="form-sub">Step 2 of 3 · Profile details</p>
+            <form id="step2Form" novalidate>
+              <div class="field">
+                <label for="fullName">Full name</label>
+                <input type="text" id="fullName" placeholder="Your name" required />
+              </div>
+              <div id="freelancerFields">
+                <div class="field">
+                  <label for="bio">Short bio</label>
+                  <textarea id="bio" rows="3" placeholder="Tell clients about your expertise"></textarea>
+                </div>
+                <div class="field">
+                  <label>Skills</label>
+                  <div class="skill-selector" id="skillSelectorContainer">
+                    <div class="skills-display" id="skillsDisplay"></div>
+                    <input type="text" class="skill-input" placeholder="Add a skill (e.g. Python)" autocomplete="off" />
+                    <div class="skill-suggestions"></div>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Profile picture <small>(optional)</small></label>
+                  <input type="file" id="profilePicture" accept="image/*" />
+                </div>
+              </div>
+              <div id="clientFields" class="hidden">
+                <div class="field">
+                  <label for="companyName">Company or organisation <small>(optional)</small></label>
+                  <input type="text" id="companyName" placeholder="e.g. Digital Solutions Ltd." />
+                </div>
+                <div class="field">
+                  <label for="clientBio">Tell freelancers about your typical projects</label>
+                  <textarea id="clientBio" rows="3" placeholder="Describe the type of work you usually need help with, your industry, etc."></textarea>
+                </div>
+              </div>
+              <div class="step-actions">
+                <button type="button" class="btn btn--ghost" id="step2Back">Back</button>
+                <button type="submit" class="btn btn--accent">Continue</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- STEP 3 -->
+          <div class="step-content hidden" id="step3Content">
+            <h2>Verify your email</h2>
+            <p class="form-sub">Step 3 of 3 · Almost done</p>
+            <div class="email-verify" id="verifyPrompt">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--violet)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <p>We sent a verification link to <strong id="verifyEmailDisplay"></strong>. Please check your inbox and click the link, then come back here.</p>
+              <button type="button" class="btn btn--accent" id="checkVerificationBtn">I’ve verified, continue</button>
+              <p class="small-note">Didn’t receive the email? <button type="button" class="link-btn" id="resendVerificationBtn">Resend</button></p>
+            </div>
+            <div id="termsSection" class="hidden">
+              <div class="terms-box">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="acceptTerms" required />
+                  I accept the <a href="#" class="link-terms">Terms of Service</a>
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="acceptPrivacy" required />
+                  I accept the <a href="#" class="link-terms">Privacy Policy</a>
+                </label>
+              </div>
+              <button type="button" class="btn btn--accent" id="completeRegistrationBtn">Complete Registration</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-side" id="infoSide">
+        <div class="info-content" id="infoContent"></div>
+      </div>
+    </div>
+
+    <p class="auth-footer">
+      Already have an account? <a href="Feature%202%20-%20Login.html">Sign in</a>
+    </p>
+  </div>
+
+  <script>
+    // ========== SKILL SELECTOR COMPONENT (fully offline) ==========
+    const SkillSelector = (function () {
+      const predefinedSkills = ["Python","JavaScript","React","Node.js","UI/UX Design","Logo Design","Content Writing","Video Editing","Social Media","Mobile Development","Data Science","Graphic Design"];
+      let selectedSkills = [];
+      let container = null;
+      let onSkillsChangeCallback = null;
+
+      function renderSkills() {
+        if (!container) return;
+        const display = container.querySelector(".skills-display");
+        if (!display) return;
+        display.innerHTML = selectedSkills.map(skill => `<span class="skill-chip">${skill} <button type="button" data-skill="${skill}">×</button></span>`).join("");
+        display.querySelectorAll("button").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            const skill = btn.getAttribute("data-skill");
+            selectedSkills = selectedSkills.filter(s => s !== skill);
+            renderSkills();
+            if (onSkillsChangeCallback) onSkillsChangeCallback(selectedSkills);
+          });
+        });
+      }
+
+      function init(containerElement, onSkillsChange) {
+        container = containerElement;
+        onSkillsChangeCallback = onSkillsChange || null;
+        // Clear container and add fresh structure
+        container.innerHTML = '<div class="skills-display"></div><input type="text" class="skill-input" placeholder="Add a skill (e.g. Python)" autocomplete="off"><div class="skill-suggestions"></div>';
+        const input = container.querySelector(".skill-input");
+        const suggestions = container.querySelector(".skill-suggestions");
+        input.addEventListener("input", () => {
+          const query = input.value.toLowerCase().trim();
+          const filtered = predefinedSkills.filter(s => s.toLowerCase().includes(query) && !selectedSkills.includes(s));
+          suggestions.innerHTML = filtered.map(s => `<div>${s}</div>`).join("");
+          suggestions.style.display = filtered.length ? "block" : "none";
+        });
+        suggestions.addEventListener("click", (e) => {
+          if (e.target.tagName === "DIV") {
+            const skill = e.target.textContent;
+            if (!selectedSkills.includes(skill)) {
+              selectedSkills.push(skill);
+              renderSkills();
+              input.value = "";
+              suggestions.style.display = "none";
+              if (onSkillsChangeCallback) onSkillsChangeCallback(selectedSkills);
+            }
+          }
+        });
+        input.addEventListener("keypress", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const customSkill = input.value.trim();
+            if (customSkill && !selectedSkills.includes(customSkill)) {
+              selectedSkills.push(customSkill);
+              renderSkills();
+              input.value = "";
+              suggestions.style.display = "none";
+              if (onSkillsChangeCallback) onSkillsChangeCallback(selectedSkills);
+            }
+          }
+        });
+        document.addEventListener("click", (e) => {
+          if (!container.contains(e.target)) suggestions.style.display = "none";
+        });
+        renderSkills();
+      }
+
+      function setSkills(skills) {
+        selectedSkills = skills || [];
+        renderSkills();
+      }
+
+      function getSkills() {
+        return [...selectedSkills];
+      }
+
+      return { init, setSkills, getSkills };
+    })();
+
+    // ========== UI Helpers ==========
+    function showNotification(message, type = "info", duration = 4000) {
+      const container = document.getElementById("notificationContainer");
+      if (!container) return;
+      const notif = document.createElement("div");
+      notif.className = `notification ${type}`;
+      notif.textContent = message;
+      container.appendChild(notif);
+      setTimeout(() => {
+        notif.classList.add("hide");
+        notif.addEventListener("animationend", () => notif.remove());
+      }, duration);
+    }
+
+    function showLoading() {
+      document.getElementById("loadingBar").classList.add("show");
+    }
+    function hideLoading() {
+      document.getElementById("loadingBar").classList.remove("show");
+    }
+
+    // ========== State ==========
+    let isFreelancer = true;
+    let currentStep = 1;
+    let tempUser = null; // stores { email, password, role, profile }
+
+    // ========== DOM elements ==========
+    const splitWrapper = document.getElementById("splitWrapper");
+    const switchRoleBtn = document.getElementById("switchRoleBtn");
+    const switchLabel = document.getElementById("switchLabel");
+    const roleLabel = document.getElementById("roleLabel");
+    const infoContent = document.getElementById("infoContent");
+    const step1Form = document.getElementById("step1Form");
+    const step2Form = document.getElementById("step2Form");
+    const step2Back = document.getElementById("step2Back");
+    const googleRegisterBtn = document.getElementById("googleRegisterBtn");
+    const checkVerificationBtn = document.getElementById("checkVerificationBtn");
+    const resendVerificationBtn = document.getElementById("resendVerificationBtn");
+    const verifyEmailDisplay = document.getElementById("verifyEmailDisplay");
+    const completeRegistrationBtn = document.getElementById("completeRegistrationBtn");
+    const verifyPrompt = document.getElementById("verifyPrompt");
+    const termsSection = document.getElementById("termsSection");
+
+    // ========== Info side updater ==========
+    function updateInfoSide(title, desc, icon) {
+      infoContent.innerHTML = `
+        <div class="info-icon">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icon === "freelancer" ? '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>' : '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>'}</svg>
+        </div>
+        <h1 id="infoTitle">${title}</h1>
+        <p id="infoDesc">${desc}</p>
+      `;
+    }
+    updateInfoSide("Register as Freelancer", "Showcase your skills, find clients, and get paid securely through Nkwa Pay escrow.", "freelancer");
+
+    // ========== Step navigation ==========
+    function showStep(step) {
+      document.querySelectorAll(".step-content").forEach(el => el.classList.add("hidden"));
+      document.getElementById(`step${step}Content`).classList.remove("hidden");
+      document.querySelectorAll(".step-indicator .step").forEach(el => {
+        el.classList.remove("active", "completed");
+        if (parseInt(el.dataset.step) === step) el.classList.add("active");
+        else if (parseInt(el.dataset.step) < step) el.classList.add("completed");
+      });
+      currentStep = step;
+    }
+
+    // ========== Role switch ==========
+    switchRoleBtn.addEventListener("click", () => {
+      if (currentStep !== 1) return;
+      isFreelancer = !isFreelancer;
+      splitWrapper.classList.toggle("swapped");
+      if (isFreelancer) {
+        switchLabel.textContent = "Client";
+        roleLabel.textContent = "Freelancer";
+        updateInfoSide("Register as Freelancer", "Showcase your skills, find clients, and get paid securely through Nkwa Pay escrow.", "freelancer");
+      } else {
+        switchLabel.textContent = "Freelancer";
+        roleLabel.textContent = "Client";
+        updateInfoSide("Register as Client", "Hire vetted talent, pay only when satisfied, and manage projects with milestones.", "client");
+      }
+    });
+
+    // ========== Step 1 → Step 2 (email/password) ==========
+    step1Form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("regEmail").value.trim();
+      const password = document.getElementById("regPassword").value;
+      if (!email || password.length < 8) {
+        showNotification("Please fill in valid email and password (min 8 characters).", "error");
+        return;
+      }
+
+      // Check if email already exists in localStorage
+      let users = JSON.parse(localStorage.getItem("techconnect_users")) || [];
+      if (users.find(u => u.email === email)) {
+        showNotification("Email already registered.", "error");
+        return;
+      }
+
+      showLoading();
+      // Store temporary user data (no Firebase)
+      tempUser = {
+        email: email,
+        password: password,
+        role: isFreelancer ? "skilled" : "client",
+        emailVerified: false,
+        profile: null
+      };
+
+      // Show step 2
+      document.getElementById("freelancerFields").style.display = isFreelancer ? "block" : "none";
+      document.getElementById("clientFields").style.display = isFreelancer ? "none" : "block";
+      SkillSelector.init(document.getElementById("skillSelectorContainer"));
+      showStep(2);
+      updateInfoSide(
+        isFreelancer ? "Profile details" : "Tell us about you",
+        isFreelancer ? "Add your skills and a short bio so clients can find you." : "Help freelancers understand your needs.",
+        isFreelancer ? "freelancer" : "client"
+      );
+      hideLoading();
+    });
+
+    // ========== Step 2 back ==========
+    step2Back.addEventListener("click", () => {
+      showStep(1);
+      updateInfoSide(
+        isFreelancer ? "Register as Freelancer" : "Register as Client",
+        isFreelancer ? "Showcase your skills, find clients, and get paid securely through Nkwa Pay escrow." : "Hire vetted talent, pay only when satisfied, and manage projects with milestones.",
+        isFreelancer ? "freelancer" : "client"
+      );
+    });
+
+    // ========== Step 2 submit ==========
+    step2Form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fullName = document.getElementById("fullName").value.trim();
+      if (!fullName) {
+        showNotification("Full name is required.", "error");
+        return;
+      }
+
+      const profile = {
+        name: fullName,
+        bio: isFreelancer ? document.getElementById("bio").value.trim() : "",
+        skills: isFreelancer ? SkillSelector.getSkills() : [],
+        companyName: !isFreelancer ? document.getElementById("companyName").value.trim() : "",
+        clientBio: !isFreelancer ? document.getElementById("clientBio").value.trim() : "",
+      };
+
+      const file = document.getElementById("profilePicture").files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          profile.profileImageURL = ev.target.result;
+          finishStep2(profile);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        finishStep2(profile);
+      }
+    });
+
+    function finishStep2(profile) {
+      tempUser.profile = profile;
+      verifyEmailDisplay.textContent = tempUser.email;
+      showStep(3);
+      updateInfoSide("Verify your email", "Check your inbox and click the link we sent you.", isFreelancer ? "freelancer" : "client");
+    }
+
+    // ========== Step 3: verification simulation ==========
+    checkVerificationBtn.addEventListener("click", () => {
+      // Simulate email verification
+      tempUser.emailVerified = true;
+      verifyPrompt.style.display = "none";
+      termsSection.classList.remove("hidden");
+    });
+
+    resendVerificationBtn.addEventListener("click", () => {
+      showNotification("Verification email resent (simulated).", "info");
+    });
+
+    completeRegistrationBtn.addEventListener("click", () => {
+      const acceptTerms = document.getElementById("acceptTerms").checked;
+      const acceptPrivacy = document.getElementById("acceptPrivacy").checked;
+      if (!acceptTerms || !acceptPrivacy) {
+        showNotification("Please accept both Terms of Service and Privacy Policy.", "error");
+        return;
+      }
+
+      showLoading();
+
+      // Save user to localStorage
+      let users = JSON.parse(localStorage.getItem("techconnect_users")) || [];
+      const newUser = {
+        uid: Date.now().toString(),
+        email: tempUser.email,
+        password: tempUser.password,
+        role: tempUser.role,
+        emailVerified: true
+      };
+      users.push(newUser);
+      localStorage.setItem("techconnect_users", JSON.stringify(users));
+
+      let profiles = JSON.parse(localStorage.getItem("techconnect_profiles")) || {};
+      profiles[newUser.uid] = { ...tempUser.profile, email: tempUser.email, role: tempUser.role };
+      localStorage.setItem("techconnect_profiles", JSON.stringify(profiles));
+
+      // Auto-login
+      localStorage.setItem("techconnect_current_user", JSON.stringify({ uid: newUser.uid, email: newUser.email, role: newUser.role }));
+
+      showNotification("Registration complete! Redirecting...", "success");
+      setTimeout(() => {
+        window.location.href = "Feature%203%20-%20Profile.html";
+      }, 1500);
+      hideLoading();
+    });
+
+    // ========== Google simulation ==========
+    googleRegisterBtn.addEventListener("click", () => {
+      showNotification("Google sign-up simulated. Please use email/password.", "info");
+    });
+
+    // ========== Password toggle ==========
+    document.querySelectorAll(".toggle-password").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const input = btn.parentElement.querySelector("input");
+        const type = input.getAttribute("type") === "password" ? "text" : "password";
+        input.setAttribute("type", type);
+        // Optionally change SVG – but fine for now
+      });
+    });
+
+    // Initialise skill selector for step 2 (will be reinitialised when step2 is shown)
+    // but we also need to make sure it's not double-initialised. Already done in step1 submit.
+  </script>
+</body>
+</html>
