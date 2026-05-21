@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home · TechConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        /* same DDS styles as before – unchanged */
+        :root {
+            --deep-gray: #1E1E1E;
+            --violet: #8E44AD;
+            --violet-light: #A569BD;
+            --violet-dark: #6C3483;
+            --soft-white: #EAEAEA;
+            --soft-white-muted: #F5F5F5;
+            --card-bg: #FFFFFF;
+            --border-subtle: #E5E5E5;
+            --text-muted: #666666;
+            --success: #27AE60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--soft-white);
+            color: var(--deep-gray);
+            line-height: 1.5;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Syne', sans-serif;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .notification {
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: translateY(-30px);
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .notification.success {
+            background: #2ecc71;
+            border-left: 4px solid #27ae60;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+            border-left: 4px solid #c0392b;
+        }
+
+        .notification.info {
+            background: var(--violet);
+            border-left: 4px solid #6a2f82;
+        }
+
+        .notification.hide {
+            animation: fadeOut 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--violet);
+            text-decoration: none;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--violet);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 65px);
+            position: relative;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-subtle);
+            padding: 2rem 1rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background-color: var(--violet);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .hero {
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .section-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+        }
+
+        .job-card:hover {
+            border-color: var(--violet);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            padding: 1.25rem 1.25rem 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .card-budget {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--violet);
+        }
+
+        .card-body {
+            padding: 0 1.25rem 0.75rem;
+        }
+
+        .card-description {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .skills-container {
+            padding: 0 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-badge {
+            background-color: rgba(142, 68, 173, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--violet);
+            font-weight: 500;
+        }
+
+        .card-footer {
+            padding: 0.75rem 1.25rem;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .deadline {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            background: #eee;
+            color: #666;
+        }
+
+        .status-active {
+            background: #27ae6010;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+
+        .status-accepted {
+            background: #8e44ad10;
+            color: var(--violet);
+            border: 1px solid var(--violet);
+        }
+
+        .status-completed {
+            background: #2980b910;
+            color: #2980b9;
+            border: 1px solid #2980b9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--violet);
+            color: var(--violet);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-left: 0.5rem;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Floating feedback button */
+        .feedback-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--violet);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .feedback-fab:hover {
+            transform: scale(1.1);
+            background: var(--violet-dark);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <nav class="navbar">
+        <a href="home.html" class="navbar-brand">TechConnect</a>
+        <div class="navbar-nav" id="navbarNav"></div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="../Module%202/home.html" class="active">Home</a></li>
+                <li><a href="../Module%202/dashboard.html">Browse Jobs</a></li>
+                <li><a href="../Module%202/post-job.html">Post a Job</a></li>
+                <li><a href="../Module%201/Feature%203%20-%20Profile.html">My Profile</a></li>
+                <li><a href="../Module%202/job-details.html">Job Details</a></li>
+                <li><a href="../Module%203/my-jobs.html">Pending Offers</a></li>
+                <li><a href="../Module%203/send-offer.html">Send Offer</a></li>
+                <li><a href="../Module%203/submit-milestone.html">Submit Work</a></li>
+                <li><a href="../Module%203/review-milestone.html">Review Work</a></li>
+                <li><a href="#" id="signOutSidebar">Sign out</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content" id="mainContent">
+            <div style="text-align: center; padding: 3rem;">Loading...</div>
+        </main>
+    </div>
+
+    <!-- Floating feedback button -->
+    <div class="feedback-fab" id="feedbackFab">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+            </polygon>
+        </svg>
+    </div>
+
+    <script>
+        // Helper functions (showNotification, getCurrentUser, getJobs, getOffers, getProfile, formatCurrency, etc.)
+        function showNotification(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('notificationContainer');
+            if (!container) return;
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.textContent = message;
+            container.appendChild(notif);
+            setTimeout(() => {
+                notif.classList.add('hide');
+                notif.addEventListener('animationend', () => notif.remove());
+            }, duration);
+        }
+
+        function isTopRated(uid) {
+            const profile = getProfile(uid);
+            if (!profile.rating) return false;
+            const ratings = JSON.parse(localStorage.getItem('techconnect_ratings')) || [];
+            const receivedCount = ratings.filter(r => r.toUserId === uid).length;
+            return profile.rating >= 4.5 && receivedCount >= 10;
+        }
+        function getCurrentUser() { return JSON.parse(localStorage.getItem('techconnect_current_user')); }
+        function getJobs() { return JSON.parse(localStorage.getItem('techconnect_jobs')) || []; }
+        function saveJobs(jobs) { localStorage.setItem('techconnect_jobs', JSON.stringify(jobs)); }
+        function getOffers() { return JSON.parse(localStorage.getItem('techconnect_offers')) || []; }
+        function getProfile(uid) { const profiles = JSON.parse(localStorage.getItem('techconnect_profiles')) || {}; return profiles[uid] || {}; }
+        function getSubmissions() { return JSON.parse(localStorage.getItem('techconnect_milestone_submissions')) || []; }
+
+        function formatCurrency(amount) { return amount.toLocaleString() + ' FCFA'; }
+        function formatDate(dateStr) { const d = new Date(dateStr); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+        function getStatusClass(status) {
+            if (status === 'active') return 'status-active';
+            if (status === 'accepted') return 'status-accepted';
+            if (status === 'completed') return 'status-completed';
+            return '';
+        }
+
+        function renderJobCard(job, showStatus = true, isClient = false) {
+            const descShort = job.description.length > 100 ? job.description.substring(0, 100) + '...' : job.description;
+            let skillsHtml = '';
+            const limit = Math.min(job.requiredSkills.length, 3);
+            for (let i = 0; i < limit; i++) skillsHtml += `<span class="skill-badge">${escapeHtml(job.requiredSkills[i])}</span>`;
+            if (job.requiredSkills.length > 3) skillsHtml += `<span class="skill-badge">+${job.requiredSkills.length - 3}</span>`;
+            const statusHtml = showStatus ? `<span class="status-badge ${getStatusClass(job.status)}">${job.status.toUpperCase()}</span>` : '';
+
+            // Check if client is top rated
+            const clientProfile = getProfile(job.clientId);
+            const clientRatings = JSON.parse(localStorage.getItem('techconnect_ratings')) || [];
+            const clientReceivedCount = clientRatings.filter(r => r.toUserId === job.clientId).length;
+            const isClientTopRated = clientProfile.rating && clientProfile.rating >= 4.5 && clientReceivedCount >= 10;
+            const topRatedBadge = isClientTopRated ? '<span style="background:gold; color:#333; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.7rem;">Top Rated</span>' : '';
+
+            const deleteBtn = isClient && (job.status === 'created' || job.status === 'active') ? `<button class="delete-btn" onclick="event.preventDefault(); deleteJob('${job.id}')">Delete</button>` : '';
+            return `
+        <div class="job-card">
+            <a href="../Module%202/job-details.html?id=${job.id}" style="text-decoration:none; color:inherit; display:block;">
+                <div class="card-header">
+                    <h3 class="card-title">${escapeHtml(job.title)}</h3>
+                    <span class="card-budget">${formatCurrency(job.budget)}</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">${escapeHtml(descShort)}</p>
+                </div>
+                <div class="skills-container">${skillsHtml}</div>
+                <div class="card-footer">
+                    <span class="deadline">Due: ${formatDate(job.deadline)}</span>
+                    ${statusHtml}
+                    ${topRatedBadge}
+                </div>
+            </a>
+            ${deleteBtn}
+        </div>
+    `;
+        }
+
+        function deleteJob(jobId) {
+            if (!confirm('Delete this job? This action cannot be undone.')) return;
+            const user = getCurrentUser();
+            if (!user || user.role !== 'client') return;
+            let jobs = getJobs();
+            const job = jobs.find(j => j.id === jobId);
+            if (!job || job.clientId !== user.uid) {
+                showNotification('You cannot delete this job.', 'error');
+                return;
+            }
+            jobs = jobs.filter(j => j.id !== jobId);
+            saveJobs(jobs);
+            showNotification('Job deleted successfully.', 'success');
+            loadHome(); // refresh
+        }
+
+        function loadHome() {
+            const user = getCurrentUser();
+            if (!user) { window.location.href = '../Module%201/Feature%202%20-%20Login.html'; return; }
+
+            const nav = document.getElementById('navbarNav');
+            if (nav) {
+                nav.innerHTML = `
+                    <a href="home.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Browse</a>
+                    <a href="post-job.html" class="nav-link">Post Job</a>
+                    <a href="../Module%201/Feature%203%20-%20Profile.html" class="nav-link">Profile</a>
+                    <a href="#" class="nav-link" id="signOutLink">Sign out</a>
+                `;
+                document.getElementById('signOutLink').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('techconnect_current_user');
+                    window.location.href = '../index.html';
+                });
+                document.getElementById('signOutSidebar').addEventListener('click', () => {
+                    localStorage.removeItem('techconnect_current_user');
+                    window.location.href = '../index.html';
+                });
+            }
+
+            const profile = getProfile(user.uid);
+            const userRole = user.role;
+            const allJobs = getJobs();
+            const offers = getOffers();
+            const main = document.getElementById('mainContent');
+
+            if (userRole === 'skilled') {
+                const acceptedOffers = offers.filter(o => o.freelancerId === user.uid && o.status === 'accepted');
+                const acceptedJobIds = acceptedOffers.map(o => o.jobId);
+                const myJobs = allJobs.filter(job => acceptedJobIds.includes(job.id));
+                const submissions = getSubmissions();
+                const submissionJobIds = submissions.filter(s => {
+                    const job = allJobs.find(j => j.id === s.jobId);
+                    return job && job.skilledUserID === user.uid;
+                }).map(s => s.jobId);
+                const combinedIds = [...new Set([...acceptedJobIds, ...submissionJobIds])];
+                const combinedJobs = allJobs.filter(job => combinedIds.includes(job.id));
+                const jobsToShow = combinedJobs.length > 0 ? combinedJobs : myJobs;
+
+                main.innerHTML = `
+                    <div class="hero">
+                        <h1>Welcome back, ${escapeHtml(profile.name || 'Freelancer')}</h1>
+                        <p>Here are the jobs you are working on</p>
+                    </div>
+                    <div class="section-header">
+                        <h3>My active projects</h3>
+                        <span>${jobsToShow.length} jobs</span>
+                    </div>
+                    <div id="myProjects" class="cards-grid"></div>
+                `;
+                const container = document.getElementById('myProjects');
+                if (jobsToShow.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><p>You haven't accepted any offers yet.</p><a href="../Module%202/dashboard.html" class="btn-outline" style="margin-top:1rem;">Browse jobs</a></div>`;
+                } else {
+                    container.innerHTML = jobsToShow.map(job => renderJobCard(job, true, false)).join('');
+                }
+            } else {
+                // Client view
+                const myJobs = allJobs.filter(job => job.clientId === user.uid);
+                main.innerHTML = `
+                    <div class="hero">
+                        <h1>Welcome back, ${escapeHtml(profile.name || 'Client')}</h1>
+                        <p>Manage your posted opportunities</p>
+                    </div>
+                    <div class="section-header">
+                        <h3>All my jobs</h3>
+                        <a href="post-job.html" style="color:var(--violet);">+ Post new job</a>
+                    </div>
+                    <div id="myJobs" class="cards-grid"></div>
+                `;
+                const container = document.getElementById('myJobs');
+                if (myJobs.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><p>You haven't posted any jobs yet.</p><a href="post-job.html" class="btn-outline" style="margin-top:1rem;">Post your first job</a></div>`;
+                } else {
+                    container.innerHTML = myJobs.map(job => renderJobCard(job, true, true)).join('');
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHome();
+            // Floating feedback button
+            document.getElementById('feedbackFab').addEventListener('click', () => {
+                window.location.href = '../Module%205/feedback.html';
+            });
+        });
+    </script>
+</body>
+
+</html>
