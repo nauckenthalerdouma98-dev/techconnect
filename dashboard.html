@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Jobs · TechConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        /* same DDS styles as before – no changes */
+        :root {
+            --deep-gray: #1E1E1E;
+            --violet: #8E44AD;
+            --violet-light: #A569BD;
+            --violet-dark: #6C3483;
+            --soft-white: #EAEAEA;
+            --soft-white-muted: #F5F5F5;
+            --card-bg: #FFFFFF;
+            --border-subtle: #E5E5E5;
+            --text-muted: #666666;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--soft-white);
+            color: var(--deep-gray);
+            line-height: 1.5;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Syne', sans-serif;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .notification {
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: translateY(-30px);
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .notification.success {
+            background: #2ecc71;
+            border-left: 4px solid #27ae60;
+        }
+
+        .notification.error {
+            background: #e74c3c;
+            border-left: 4px solid #c0392b;
+        }
+
+        .notification.info {
+            background: var(--violet);
+            border-left: 4px solid #6a2f82;
+        }
+
+        .notification.hide {
+            animation: fadeOut 0.3s ease forwards;
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--violet);
+            text-decoration: none;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--violet);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: calc(100vh - 65px);
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-subtle);
+            padding: 2rem 1rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background-color: var(--violet);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .search-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 400px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            background: var(--soft-white-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            background: var(--soft-white-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 0.75rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .job-card:hover {
+            border-color: var(--violet);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            padding: 1.25rem 1.25rem 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .card-budget {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--violet);
+        }
+
+        .card-body {
+            padding: 0 1.25rem 0.75rem;
+        }
+
+        .card-description {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .skills-container {
+            padding: 0 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-badge {
+            background: rgba(142, 68, 173, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            color: var(--violet);
+        }
+
+        .card-footer {
+            padding: 0.75rem 1.25rem;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .deadline {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--violet);
+            color: var(--violet);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="notification-container" id="notificationContainer"></div>
+    <nav class="navbar">
+        <a href="home.html" class="navbar-brand">TechConnect</a>
+        <div class="navbar-nav" id="navbarNav"></div>
+    </nav>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="../Module%202/home.html">Home</a></li>
+                <li><a href="../Module%202/dashboard.html" class="active">Browse Jobs</a></li>
+                <li><a href="../Module%202/post-job.html">Post a Job</a></li>
+                <li><a href="../Module%201/Feature%203%20-%20Profile.html">My Profile</a></li>
+                <li><a href="../Module%202/job-details.html">Job Details</a></li>
+                <li><a href="../Module%203/my-jobs.html">Pending Offers</a></li>
+                <li><a href="../Module%203/send-offer.html">Send Offer</a></li>
+                <li><a href="../Module%203/submit-milestone.html">Submit Work</a></li>
+                <li><a href="../Module%203/review-milestone.html">Review Work</a></li>
+                <li><a href="#" id="signOutSidebar">Sign out</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div class="search-section">
+                <div class="search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search by title, skill...">
+                </div>
+            </div>
+            <div class="filter-bar">
+                <select id="skillFilter" class="filter-select">
+                    <option value="">All skills</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="Python">Python</option>
+                    <option value="React">React</option>
+                    <option value="Typing">Typing</option>
+                    <option value="Data Entry">Data Entry</option>
+                </select>
+                <select id="levelFilter" class="filter-select">
+                    <option value="">All levels</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+            <div id="jobsContainer" class="cards-grid"></div>
+        </main>
+    </div>
+
+    <script>
+        function showNotification(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('notificationContainer');
+            if (!container) return;
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.textContent = message;
+            container.appendChild(notif);
+            setTimeout(() => {
+                notif.classList.add('hide');
+                notif.addEventListener('animationend', () => notif.remove());
+            }, duration);
+        }
+
+        function isTopRated(uid) {
+            const profile = getProfile(uid);
+            if (!profile.rating) return false;
+            const ratings = JSON.parse(localStorage.getItem('techconnect_ratings')) || [];
+            const receivedCount = ratings.filter(r => r.toUserId === uid).length;
+            return profile.rating >= 4.5 && receivedCount >= 10;
+        }
+
+        function getCurrentUser() { return JSON.parse(localStorage.getItem('techconnect_current_user')); }
+        function getJobs() { return JSON.parse(localStorage.getItem('techconnect_jobs')) || []; }
+        function saveJobs(jobs) { localStorage.setItem('techconnect_jobs', JSON.stringify(jobs)); }
+
+        function formatCurrency(amt) { return amt.toLocaleString() + ' FCFA'; }
+        function formatDate(d) { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+        function escapeHtml(str) { return str?.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])) || ''; }
+
+        function renderJobCard(job, showStatus = true, isClient = false) {
+            const descShort = job.description.length > 100 ? job.description.substring(0, 100) + '...' : job.description;
+            let skillsHtml = '';
+            const limit = Math.min(job.requiredSkills.length, 3);
+            for (let i = 0; i < limit; i++) skillsHtml += `<span class="skill-badge">${escapeHtml(job.requiredSkills[i])}</span>`;
+            if (job.requiredSkills.length > 3) skillsHtml += `<span class="skill-badge">+${job.requiredSkills.length - 3}</span>`;
+            const statusHtml = showStatus ? `<span class="status-badge ${getStatusClass(job.status)}">${job.status.toUpperCase()}</span>` : '';
+
+            // Check if client is top rated
+            const clientProfile = getProfile(job.clientId);
+            const clientRatings = JSON.parse(localStorage.getItem('techconnect_ratings')) || [];
+            const clientReceivedCount = clientRatings.filter(r => r.toUserId === job.clientId).length;
+            const isClientTopRated = clientProfile.rating && clientProfile.rating >= 4.5 && clientReceivedCount >= 10;
+            const topRatedBadge = isClientTopRated ? '<span style="background:gold; color:#333; padding:0.2rem 0.5rem; border-radius:12px; font-size:0.7rem;">Top Rated</span>' : '';
+
+            const deleteBtn = isClient && (job.status === 'created' || job.status === 'active') ? `<button class="delete-btn" onclick="event.preventDefault(); deleteJob('${job.id}')">Delete</button>` : '';
+            return `
+        <div class="job-card">
+            <a href="../Module%202/job-details.html?id=${job.id}" style="text-decoration:none; color:inherit; display:block;">
+                <div class="card-header">
+                    <h3 class="card-title">${escapeHtml(job.title)}</h3>
+                    <span class="card-budget">${formatCurrency(job.budget)}</span>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">${escapeHtml(descShort)}</p>
+                </div>
+                <div class="skills-container">${skillsHtml}</div>
+                <div class="card-footer">
+                    <span class="deadline">Due: ${formatDate(job.deadline)}</span>
+                    ${statusHtml}
+                    ${topRatedBadge}
+                </div>
+            </a>
+            ${deleteBtn}
+        </div>
+    `;
+        }
+
+        function ensureSampleJobs() {
+            let jobs = getJobs();
+            if (jobs.length === 0) {
+                // Create 4 sample jobs
+                const sampleJobs = [
+                    {
+                        id: 'job_sample_1',
+                        title: 'Data Entry Clerk',
+                        description: 'Enter customer data into Excel spreadsheet. Simple copy-paste work. No experience needed.',
+                        budget: 25000,
+                        deadline: '2025-01-15',
+                        requiredSkills: ['Typing', 'Data Entry', 'Microsoft Excel'],
+                        level: 'beginner',
+                        milestones: [{ description: 'Initial data entry', amount: 15000 }, { description: 'Verification', amount: 10000 }],
+                        clientId: 'sample_client',
+                        status: 'active',
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: 'job_sample_2',
+                        title: 'Typing Job - Document Transcription',
+                        description: 'Convert handwritten notes to typed Word documents. Need 40 WPM typing speed.',
+                        budget: 15000,
+                        deadline: '2025-01-20',
+                        requiredSkills: ['Typing', 'Microsoft Word'],
+                        level: 'beginner',
+                        milestones: [{ description: 'First batch', amount: 7500 }, { description: 'Final batch', amount: 7500 }],
+                        clientId: 'sample_client',
+                        status: 'active',
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: 'job_sample_3',
+                        title: 'E-commerce Website Development',
+                        description: 'Build a full e-commerce store with product catalog, shopping cart, and payment integration.',
+                        budget: 350000,
+                        deadline: '2025-02-10',
+                        requiredSkills: ['JavaScript', 'React', 'Node.js'],
+                        level: 'advanced',
+                        milestones: [{ description: 'Project setup', amount: 50000 }, { description: 'Frontend development', amount: 120000 }, { description: 'Backend API', amount: 100000 }, { description: 'Testing & deployment', amount: 80000 }],
+                        clientId: 'sample_client',
+                        status: 'active',
+                        createdAt: new Date().toISOString()
+                    },
+                    {
+                        id: 'job_sample_4',
+                        title: 'UI/UX Design for SaaS Platform',
+                        description: 'Design complete design system and high-fidelity prototypes in Figma.',
+                        budget: 250000,
+                        deadline: '2025-01-28',
+                        requiredSkills: ['UI/UX Design', 'Figma'],
+                        level: 'intermediate',
+                        milestones: [{ description: 'Wireframes', amount: 60000 }, { description: 'High-fidelity mockups', amount: 100000 }, { description: 'Design system', amount: 90000 }],
+                        clientId: 'sample_client',
+                        status: 'active',
+                        createdAt: new Date().toISOString()
+                    }
+                ];
+                saveJobs(sampleJobs);
+                jobs = sampleJobs;
+                showNotification('Sample jobs have been added for demonstration.', 'info');
+            }
+            return jobs;
+        }
+
+        function filterJobs() {
+            let jobs = ensureSampleJobs(); // this also returns the jobs
+            jobs = jobs.filter(j => j.status === 'active');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const skill = document.getElementById('skillFilter').value;
+            const level = document.getElementById('levelFilter').value;
+            let filtered = jobs.filter(job => {
+                if (search && !job.title.toLowerCase().includes(search) && !job.description.toLowerCase().includes(search) && !job.requiredSkills.some(s => s.toLowerCase().includes(search))) return false;
+                if (skill && !job.requiredSkills.includes(skill)) return false;
+                if (level && job.level !== level) return false;
+                return true;
+            });
+            document.getElementById('jobsContainer').innerHTML = filtered.length ? filtered.map(renderJobCard).join('') : '<div class="empty-state"><p>No jobs match your filters.</p></div>';
+        }
+
+        function init() {
+            const user = getCurrentUser();
+            if (!user) { window.location.href = '../Module%201/Feature%202%20-%20Login.html'; return; }
+            const nav = document.getElementById('navbarNav');
+            nav.innerHTML = `<a href="home.html" class="nav-link">Home</a><a href="dashboard.html" class="nav-link">Browse</a><a href="post-job.html" class="nav-link">Post Job</a><a href="../Module%201/Feature%203%20-%20Profile.html" class="nav-link">Profile</a><a href="#" class="nav-link" id="signOutLink">Sign out</a>`;
+            document.getElementById('signOutLink').addEventListener('click', () => { localStorage.removeItem('techconnect_current_user'); window.location.href = '../index.html'; });
+            document.getElementById('signOutSidebar').addEventListener('click', () => { localStorage.removeItem('techconnect_current_user'); window.location.href = '../index.html'; });
+            document.getElementById('searchInput').addEventListener('input', filterJobs);
+            document.getElementById('skillFilter').addEventListener('change', filterJobs);
+            document.getElementById('levelFilter').addEventListener('change', filterJobs);
+            filterJobs();
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

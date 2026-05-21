@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job · TechConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --deep-gray:#1E1E1E; --violet:#8E44AD; --soft-white:#EAEAEA; --card-bg:#FFF; --border-subtle:#E5E5E5; --text-muted:#666; --error:#E74C3C; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Space Grotesk',sans-serif; background:var(--soft-white); color:var(--deep-gray); line-height:1.5; }
+        h1,h2,h3 { font-family:'Syne',sans-serif; }
+        .notification-container { position:fixed; top:1.5rem; left:50%; transform:translateX(-50%); z-index:9999; width:90%; max-width:400px; }
+        .notification { padding:1rem; border-radius:12px; color:#fff; margin-bottom:0.5rem; animation:slideIn 0.3s forwards; }
+        .notification.success { background:#2ecc71; } .notification.error { background:#e74c3c; } .notification.info { background:var(--violet); }
+        @keyframes slideIn { from { opacity:0; transform:translateY(-30px); } to { opacity:1; transform:translateY(0); } }
+        .navbar { background:var(--card-bg); border-bottom:1px solid var(--border-subtle); padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+        .navbar-brand { font-size:1.5rem; font-weight:700; color:var(--violet); text-decoration:none; }
+        .navbar-nav { display:flex; gap:1.5rem; align-items:center; }
+        .nav-link { color:var(--text-muted); text-decoration:none; font-size:0.875rem; }
+        .nav-link:hover { color:var(--violet); }
+        .dashboard-container { display:flex; min-height:calc(100vh - 65px); }
+        .sidebar { width:260px; background:var(--card-bg); border-right:1px solid var(--border-subtle); padding:2rem 1rem; }
+        .sidebar-menu { list-style:none; }
+        .sidebar-menu a { display:flex; gap:0.75rem; padding:0.75rem 1rem; color:var(--text-muted); text-decoration:none; border-radius:8px; font-size:0.875rem; transition:0.2s; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background:var(--violet); color:white; }
+        .main-content { flex:1; padding:2rem; max-width:800px; margin:0 auto; }
+        .form-card { background:var(--card-bg); border:1px solid var(--border-subtle); border-radius:20px; padding:2rem; }
+        .form-group { margin-bottom:1.5rem; }
+        .form-group label { display:block; margin-bottom:0.5rem; font-weight:500; }
+        .form-group input, .form-group textarea, .form-group select { width:100%; padding:0.75rem; background:var(--soft-white); border:1px solid var(--border-subtle); border-radius:12px; font-family:inherit; }
+        .form-group input:focus, .form-group textarea:focus { outline:none; border-color:var(--violet); }
+        .milestones-container { margin:1rem 0; }
+        .milestone-item { background:var(--soft-white); padding:1rem; border-radius:12px; margin-bottom:1rem; }
+        .btn-icon { background:none; border:none; cursor:pointer; color:var(--error); float:right; }
+        .add-milestone-btn { width:100%; background:var(--soft-white); border:1px dashed var(--border-subtle); border-radius:12px; padding:0.75rem; color:var(--violet); cursor:pointer; margin-top:0.5rem; }
+        .form-actions { display:flex; gap:1rem; justify-content:flex-end; margin-top:2rem; }
+        .btn-primary { background:var(--violet); color:white; border:none; padding:0.75rem 1.5rem; border-radius:12px; cursor:pointer; font-weight:600; }
+        .btn-outline { background:transparent; border:1px solid var(--border-subtle); padding:0.75rem 1.5rem; border-radius:12px; cursor:pointer; }
+        .info-message { background:rgba(142,68,173,0.1); padding:1.5rem; border-radius:16px; text-align:center; margin-bottom:1rem; }
+        .info-message p { margin-bottom:1rem; color:var(--violet); }
+    </style>
+</head>
+<body>
+    <div class="notification-container" id="notificationContainer"></div>
+    <nav class="navbar"><a href="home.html" class="navbar-brand">TechConnect</a><div class="navbar-nav" id="navbarNav"></div></nav>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="../Module%202/home.html">Home</a></li>
+                <li><a href="../Module%202/dashboard.html">Browse Jobs</a></li>
+                <li><a href="../Module%202/post-job.html" class="active">Post a Job</a></li>
+                <li><a href="../Module%201/Feature%203%20-%20Profile.html">My Profile</a></li>
+                <li><a href="../Module%202/job-details.html">Job Details</a></li>
+                <li><a href="../Module%203/my-jobs.html">Pending Offers</a></li>
+                <li><a href="../Module%203/send-offer.html">Send Offer</a></li>
+                <li><a href="../Module%203/submit-milestone.html">Submit Work</a></li>
+                <li><a href="../Module%203/review-milestone.html">Review Work</a></li>
+                <li><a href="#" id="signOutSidebar">Sign out</a></li>
+            </ul>
+        </aside>
+        <main class="main-content" id="mainContent">
+            <!-- Static form – always present, but will be hidden for non-clients -->
+            <div class="form-card" id="clientForm">
+                <h2>Post a new opportunity</h2>
+                <form id="postJobForm">
+                    <div class="form-group"><label>Job Title *</label><input type="text" id="title" required></div>
+                    <div class="form-group"><label>Description *</label><textarea id="description" rows="4" required></textarea></div>
+                    <div class="form-group"><label>Total Budget (FCFA) *</label><input type="number" id="budget" required></div>
+                    <div class="form-group"><label>Deadline *</label><input type="date" id="deadline" required></div>
+                    <div class="form-group"><label>Required Skills</label><select id="skills" multiple size="4"><option>JavaScript</option><option>Python</option><option>React</option><option>Node.js</option><option>Typing</option><option>Data Entry</option><option>UI/UX Design</option></select><small>Hold Ctrl/Cmd to select multiple</small></div>
+                    <div class="form-group"><label>Experience Level *</label><select id="level"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
+                    <div class="form-group"><label>Milestones</label><div id="milestonesContainer"></div><button type="button" class="add-milestone-btn" id="addMilestoneBtn">+ Add milestone</button></div>
+                    <div class="form-actions"><button type="button" class="btn-outline" id="cancelBtn">Cancel</button><button type="submit" class="btn-primary">Post Job</button></div>
+                </form>
+            </div>
+            <div id="nonClientMessage" style="display:none;" class="form-card">
+                <div class="info-message">
+                    <p>Only clients can post jobs. Your account is registered as a freelancer.</p>
+                    <p>If you want to post a job, please sign out and create a new account as a client.</p>
+                    <a href="../Module%201/Feature%201%20-%20Register.html" class="btn-outline" style="display:inline-block; margin-top:0.5rem;">Register as client</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ========== NOTIFICATION HELPER ==========
+        function showNotification(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('notificationContainer');
+            if (!container) return;
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.textContent = message;
+            container.appendChild(notif);
+            setTimeout(() => {
+                notif.classList.add('hide');
+                notif.addEventListener('animationend', () => notif.remove());
+            }, duration);
+        }
+
+        // ========== HELPER FUNCTIONS ==========
+        function escapeHtml(str) { return str?.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])) || ''; }
+        function getCurrentUser() { return JSON.parse(localStorage.getItem('techconnect_current_user')); }
+        function getJobs() { return JSON.parse(localStorage.getItem('techconnect_jobs')) || []; }
+        function saveJobs(jobs) { localStorage.setItem('techconnect_jobs', JSON.stringify(jobs)); }
+
+        // ========== MILESTONE MANAGEMENT ==========
+        let milestones = [{ description: '', amount: 0 }];
+
+        function renderMilestones() {
+            const container = document.getElementById('milestonesContainer');
+            if (!container) return;
+            container.innerHTML = milestones.map((m, idx) => `
+                <div class="milestone-item">
+                    <button type="button" class="btn-icon" data-idx="${idx}">✖</button>
+                    <div><strong>Milestone ${idx+1}</strong></div>
+                    <input type="text" placeholder="Description" value="${escapeHtml(m.description)}" data-field="desc" data-idx="${idx}" style="width:100%; margin-bottom:0.5rem;">
+                    <input type="number" placeholder="Amount (FCFA)" value="${m.amount}" data-field="amount" data-idx="${idx}" style="width:100%;">
+                </div>
+            `).join('');
+            document.querySelectorAll('[data-field="desc"]').forEach(inp => inp.addEventListener('input', e => { milestones[e.target.dataset.idx].description = e.target.value; }));
+            document.querySelectorAll('[data-field="amount"]').forEach(inp => inp.addEventListener('input', e => { milestones[e.target.dataset.idx].amount = parseFloat(e.target.value) || 0; }));
+            document.querySelectorAll('.btn-icon').forEach(btn => btn.addEventListener('click', e => { const idx = parseInt(btn.dataset.idx); if(milestones.length>1) { milestones.splice(idx,1); renderMilestones(); } }));
+        }
+
+        // ========== FORM SUBMIT HANDLER ==========
+        function submitJob(e) {
+            e.preventDefault();
+            const user = getCurrentUser();
+            if (!user || user.role !== 'client') {
+                showNotification('Only clients can post jobs. Please register as a client.', 'error');
+                return;
+            }
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const budget = parseFloat(document.getElementById('budget').value);
+            const deadline = document.getElementById('deadline').value;
+            const skillsSelect = document.getElementById('skills');
+            const requiredSkills = Array.from(skillsSelect.selectedOptions).map(opt => opt.value);
+            const level = document.getElementById('level').value;
+
+            if (!title || !description || isNaN(budget) || budget <= 0 || !deadline || new Date(deadline) <= new Date() || requiredSkills.length === 0) {
+                showNotification('Please fill all required fields correctly', 'error');
+                return;
+            }
+            const validMilestones = milestones.filter(m => m.description.trim() && m.amount > 0);
+            if (validMilestones.length === 0) {
+                showNotification('Add at least one valid milestone', 'error');
+                return;
+            }
+            const totalMilestones = validMilestones.reduce((s, m) => s + m.amount, 0);
+            if (Math.abs(totalMilestones - budget) > 1) {
+                showNotification(`Total milestone amount (${totalMilestones.toLocaleString()} FCFA) must equal budget (${budget.toLocaleString()} FCFA)`, 'error');
+                return;
+            }
+            const jobs = getJobs();
+            const newJob = {
+                id: 'job_' + Date.now(),
+                title, description, budget, deadline, requiredSkills, level,
+                milestones: validMilestones,
+                clientId: user.uid,
+                status: 'created',
+                createdAt: new Date().toISOString()
+            };
+            jobs.push(newJob);
+            saveJobs(jobs);
+            showNotification('Job posted successfully!', 'success');
+            setTimeout(() => window.location.href = '../Module%204/payment.html?jobId=' + newJob.id, 1500);
+        }
+
+        // ========== INIT ==========
+        function init() {
+            const user = getCurrentUser();
+            if (!user) {
+                window.location.href = '../Module%201/Feature%202%20-%20Login.html';
+                return;
+            }
+            // Update navbar
+            const nav = document.getElementById('navbarNav');
+            nav.innerHTML = `<a href="home.html" class="nav-link">Home</a><a href="dashboard.html" class="nav-link">Browse</a><a href="post-job.html" class="nav-link">Post Job</a><a href="../Module%201/Feature%203%20-%20Profile.html" class="nav-link">Profile</a><a href="#" class="nav-link" id="signOutLink">Sign out</a>`;
+            document.getElementById('signOutLink').addEventListener('click', () => { localStorage.removeItem('techconnect_current_user'); window.location.href = '../index.html'; });
+            document.getElementById('signOutSidebar').addEventListener('click', () => { localStorage.removeItem('techconnect_current_user'); window.location.href = '../index.html'; });
+
+            // Show/hide appropriate content based on role
+            const clientForm = document.getElementById('clientForm');
+            const nonClientMsg = document.getElementById('nonClientMessage');
+            if (user.role === 'client') {
+                clientForm.style.display = 'block';
+                nonClientMsg.style.display = 'none';
+                renderMilestones();
+                document.getElementById('addMilestoneBtn').addEventListener('click', () => { milestones.push({ description: '', amount: 0 }); renderMilestones(); });
+                document.getElementById('postJobForm').addEventListener('submit', submitJob);
+                document.getElementById('cancelBtn').addEventListener('click', () => {
+                    if (confirm('Clear all?')) {
+                        document.getElementById('postJobForm').reset();
+                        milestones = [{ description: '', amount: 0 }];
+                        renderMilestones();
+                    }
+                });
+            } else {
+                clientForm.style.display = 'none';
+                nonClientMsg.style.display = 'block';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
