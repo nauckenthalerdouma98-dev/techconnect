@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard · TechConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        .admin-container { max-width: 1200px; margin: 2rem auto; }
+        table { width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 16px; overflow: hidden; color: #1E1E1E; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        th { background: #f5f5f5; font-weight: 600; }
+        tr:hover { background: #f9f9f9; }
+        .badge-suspended { background: #e74c3c; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.7rem; }
+        .badge-disputed { background: #e67e22; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.7rem; }
+        .btn-suspend { background: #f39c12; color: white; border: none; padding: 0.2rem 0.5rem; border-radius: 6px; cursor: pointer; }
+        .btn-activate { background: #2ecc71; }
+        .btn-delete { background: #e74c3c; color: white; border: none; padding: 0.2rem 0.5rem; border-radius: 6px; cursor: pointer; margin-left: 0.5rem; }
+        .btn-dispute { background: #e67e22; color: white; border: none; padding: 0.2rem 0.5rem; border-radius: 6px; cursor: pointer; }
+        .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 1px solid #ddd; flex-wrap: wrap; }
+        .tab { padding: 0.75rem 1.5rem; cursor: pointer; background: none; border: none; font-weight: 600; font-size: 1rem; color: #666; }
+        .tab.active { border-bottom: 2px solid var(--violet); color: var(--violet); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .clear-data-btn { background: #c0392b; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="notification-container" id="notificationContainer"></div>
+    <header class="header">
+        <div class="header__inner">
+            <a href="../Module%202/home.html" class="logo">TechConnect Admin</a>
+            <nav class="nav">
+                <a href="#" id="logoutLink">Sign out</a>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <div class="admin-container">
+            <h1>Admin Dashboard</h1>
+            <div class="tabs">
+                <button class="tab active" data-tab="users">Users</button>
+                <button class="tab" data-tab="jobs">Jobs</button>
+                <button class="tab" data-tab="payments">Payments</button>
+                <button class="tab" data-tab="disputes">Disputes</button>
+            </div>
+            <div id="usersTab" class="tab-content active">
+                <h2>All Users</h2>
+                <div id="usersTable"></div>
+            </div>
+            <div id="jobsTab" class="tab-content">
+                <h2>All Jobs</h2>
+                <div id="jobsTable"></div>
+            </div>
+            <div id="paymentsTab" class="tab-content">
+                <h2>Payment Logs</h2>
+                <div id="paymentsTable"></div>
+            </div>
+            <div id="disputesTab" class="tab-content">
+                <h2>Dispute Resolution</h2>
+                <div id="disputesList"></div>
+            </div>
+            <button class="clear-data-btn" id="clearAllData">Clear All Data (Reset App)</button>
+        </div>
+    </div>
+    <script>
+        function showNotification(msg, type) {
+            const container = document.getElementById('notificationContainer');
+            if (!container) return;
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.textContent = msg;
+            container.appendChild(notif);
+            setTimeout(() => {
+                notif.classList.add('hide');
+                notif.addEventListener('animationend', () => notif.remove());
+            }, 4000);
+        }
+        function getCurrentUser() { return JSON.parse(localStorage.getItem('techconnect_current_user')); }
+        function getUsers() { return JSON.parse(localStorage.getItem('techconnect_users')) || []; }
+        function saveUsers(users) { localStorage.setItem('techconnect_users', JSON.stringify(users)); }
+        function getProfiles() { return JSON.parse(localStorage.getItem('techconnect_profiles')) || {}; }
+        function saveProfiles(profiles) { localStorage.setItem('techconnect_profiles', JSON.stringify(profiles)); }
+        function getJobs() { return JSON.parse(localStorage.getItem('techconnect_jobs')) || []; }
+        function saveJobs(jobs) { localStorage.setItem('techconnect_jobs', JSON.stringify(jobs)); }
+        function getPayments() { return JSON.parse(localStorage.getItem('techconnect_payments')) || []; }
+        function savePayments(payments) { localStorage.setItem('techconnect_payments', JSON.stringify(payments)); }
+        function getOffers() { return JSON.parse(localStorage.getItem('techconnect_offers')) || []; }
+        function saveOffers(offers) { localStorage.setItem('techconnect_offers', JSON.stringify(offers)); }
+        function getSubmissions() { return JSON.parse(localStorage.getItem('techconnect_milestone_submissions')) || []; }
+        function saveSubmissions(sub) { localStorage.setItem('techconnect_milestone_submissions', JSON.stringify(sub)); }
+
+        function toggleSuspend(uid, currentStatus) {
+            let users = getUsers();
+            const userIndex = users.findIndex(u => u.uid === uid);
+            if (userIndex === -1) return;
+            users[userIndex].suspended = !currentStatus;
+            saveUsers(users);
+            showNotification(`User ${currentStatus ? 'activated' : 'suspended'}`, 'success');
+            loadUsers();
+        }
+
+        function deleteUser(uid, email) {
+            if (!confirm(`Delete user ${email}? This will also remove their profile, jobs, offers, submissions, and ratings.`)) return;
+            let users = getUsers().filter(u => u.uid !== uid);
+            let profiles = getProfiles();
+            delete profiles[uid];
+            let jobs = getJobs().filter(j => j.clientId !== uid && j.skilledUserID !== uid);
+            let offers = getOffers().filter(o => o.clientId !== uid && o.freelancerId !== uid);
+            let submissions = getSubmissions().filter(s => {
+                const job = jobs.find(j => j.id === s.jobId);
+                return job;
+            });
+            let payments = getPayments().filter(p => p.clientId !== uid);
+            let ratings = JSON.parse(localStorage.getItem('techconnect_ratings') || []).filter(r => r.fromUserId !== uid && r.toUserId !== uid);
+            saveUsers(users);
+            saveProfiles(profiles);
+            saveJobs(jobs);
+            saveOffers(offers);
+            saveSubmissions(submissions);
+            savePayments(payments);
+            localStorage.setItem('techconnect_ratings', JSON.stringify(ratings));
+            showNotification(`User ${email} deleted.`, 'success');
+            loadUsers();
+            loadJobs();
+            loadPayments();
+            loadDisputes();
+        }
+
+        function deleteJob(jobId) {
+            if (!confirm(`Delete job ${jobId}? This will also remove related offers, submissions, and payments.`)) return;
+            let jobs = getJobs().filter(j => j.id !== jobId);
+            let offers = getOffers().filter(o => o.jobId !== jobId);
+            let submissions = getSubmissions().filter(s => s.jobId !== jobId);
+            let payments = getPayments().filter(p => p.jobId !== jobId);
+            saveJobs(jobs);
+            saveOffers(offers);
+            saveSubmissions(submissions);
+            savePayments(payments);
+            showNotification(`Job ${jobId} deleted.`, 'success');
+            loadJobs();
+            loadPayments();
+            loadDisputes();
+        }
+
+        function toggleDispute(jobId, currentDisputed) {
+            let jobs = getJobs();
+            const jobIndex = jobs.findIndex(j => j.id === jobId);
+            if (jobIndex === -1) return;
+            jobs[jobIndex].disputed = !currentDisputed;
+            saveJobs(jobs);
+            showNotification(`Job dispute ${currentDisputed ? 'resolved (funds unfrozen)' : 'frozen (no payments/releases allowed)'}`, 'success');
+            loadDisputes();
+            loadJobs();
+        }
+
+        function clearAllData() {
+            if (!confirm('⚠️ THIS WILL DELETE EVERYTHING: users, jobs, payments, offers, submissions, ratings. Are you absolutely sure?')) return;
+            localStorage.clear();
+            showNotification('All data cleared. Redirecting to home...', 'success');
+            setTimeout(() => window.location.href = '../index.html', 2000);
+        }
+
+        function escapeHtml(str) { return str?.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])) || ''; }
+
+        function loadUsers() {
+            const users = getUsers();
+            const profiles = getProfiles();
+            const container = document.getElementById('usersTable');
+            if (users.length === 0) { container.innerHTML = '<p>No users found.</p>'; return; }
+            let html = '<table><thead><tr><th>Email</th><th>Role</th><th>Name</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+            users.forEach(user => {
+                const profile = profiles[user.uid] || {};
+                const isSuspended = user.suspended === true;
+                html += `<tr>
+                    <td>${escapeHtml(user.email)}</td>
+                    <td>${user.role}</td>
+                    <td>${escapeHtml(profile.name || '-')}</td>
+                    <td>${profile.rating ? profile.rating.toFixed(1) : 'N/A'}</td>
+                    <td>${isSuspended ? '<span class="badge-suspended">Suspended</span>' : 'Active'}</td>
+                    <td>
+                        <button class="btn-suspend ${isSuspended ? 'btn-activate' : ''}" onclick="toggleSuspend('${user.uid}', ${isSuspended})">${isSuspended ? 'Activate' : 'Suspend'}</button>
+                        <button class="btn-delete" onclick="deleteUser('${user.uid}', '${escapeHtml(user.email)}')">Delete</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function loadJobs() {
+            const jobs = getJobs();
+            const container = document.getElementById('jobsTable');
+            if (jobs.length === 0) { container.innerHTML = '<p>No jobs found.</p>'; return; }
+            let html = '<table><thead><tr><th>ID</th><th>Title</th><th>Budget</th><th>Status</th><th>Disputed</th><th>Client</th><th>Freelancer</th><th>Actions</th></tr></thead><tbody>';
+            jobs.forEach(job => {
+                const isDisputed = job.disputed === true;
+                html += `<tr>
+                    <td>${escapeHtml(job.id)}</td>
+                    <td>${escapeHtml(job.title)}</td>
+                    <td>${job.budget.toLocaleString()} FCFA</td>
+                    <td>${job.status}</td>
+                    <td>${isDisputed ? '<span class="badge-disputed">Disputed</span>' : 'No'}</td>
+                    <td>${job.clientId}</td>
+                    <td>${job.skilledUserID || '-'}</td>
+                    <td>
+                        <button class="btn-delete" onclick="deleteJob('${job.id}')">Delete</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function loadPayments() {
+            const payments = getPayments();
+            const container = document.getElementById('paymentsTable');
+            if (payments.length === 0) { container.innerHTML = '<p>No payments found.</p>'; return; }
+            let html = '<tr><thead><tr><th>Transaction ID</th><th>Job ID</th><th>Amount</th><th>Commission</th><th>Total</th><th>Date</th><th>Status</th></tr></thead><tbody>';
+            payments.forEach(p => {
+                html += `<tr>
+                    <td>${escapeHtml(p.id)}</td>
+                    <td>${escapeHtml(p.jobId)}</td>
+                    <td>${p.amount.toLocaleString()} FCFA</td>
+                    <td>${p.commission.toLocaleString()} FCFA</td>
+                    <td>${p.totalPaid.toLocaleString()} FCFA</td>
+                    <td>${new Date(p.timestamp).toLocaleString()}</td>
+                    <td>${p.status}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function loadDisputes() {
+            const jobs = getJobs();
+            const disputed = jobs.filter(j => j.disputed === true);
+            const container = document.getElementById('disputesList');
+            if (disputed.length === 0) {
+                container.innerHTML = '<p>No disputed jobs. Use the Jobs tab to mark a job as disputed.</p>';
+                return;
+            }
+            let html = '</table><thead><tr><th>Job ID</th><th>Title</th><th>Client</th><th>Freelancer</th><th>Action</th></tr></thead><tbody>';
+            disputed.forEach(job => {
+                html += `<tr>
+                    <td>${escapeHtml(job.id)}</td>
+                    <td>${escapeHtml(job.title)}</td>
+                    <td>${job.clientId}</td>
+                    <td>${job.skilledUserID || 'Not assigned'}</td>
+                    <td><button class="btn-dispute" onclick="toggleDispute('${job.id}', true)">Resolve (Unfreeze)</button></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function initAdmin() {
+            const user = getCurrentUser();
+            if (!user || (user.role !== 'admin' && user.email !== 'Admin01@gmail.com')) {
+                window.location.href = '../Module%201/Feature%202%20-%20Login.html';
+                return;
+            }
+            document.getElementById('logoutLink').addEventListener('click', () => {
+                localStorage.removeItem('techconnect_current_user');
+                window.location.href = '../index.html';
+            });
+            document.getElementById('clearAllData').addEventListener('click', clearAllData);
+            loadUsers();
+            loadJobs();
+            loadPayments();
+            loadDisputes();
+            document.querySelectorAll('.tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                    document.getElementById(tabId + 'Tab').classList.add('active');
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    btn.classList.add('active');
+                    if (tabId === 'disputes') loadDisputes();
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initAdmin);
+    </script>
+</body>
+</html>
