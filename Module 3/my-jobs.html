@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Pending Offers · TechConnect</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* DDS styles (same as Module 2) */
+        :root {
+            --deep-gray: #1E1E1E;
+            --violet: #8E44AD;
+            --violet-light: #A569BD;
+            --violet-dark: #6C3483;
+            --soft-white: #EAEAEA;
+            --soft-white-muted: #F5F5F5;
+            --card-bg: #FFFFFF;
+            --border-subtle: #E5E5E5;
+            --text-muted: #666666;
+            --success: #27AE60;
+            --error: #E74C3C;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--soft-white);
+            color: var(--deep-gray);
+            line-height: 1.5;
+        }
+        h1, h2, h3, h4 { font-family: 'Syne', sans-serif; }
+        .notification-container {
+            position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
+            z-index: 9999; width: 90%; max-width: 400px;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        .notification {
+            padding: 1rem 1.2rem; border-radius: 12px; color: #fff;
+            font-size: 0.9rem; font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            opacity: 0; transform: translateY(-30px);
+            animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1) forwards;
+        }
+        .notification.success { background:#2ecc71; }
+        .notification.error { background:#e74c3c; }
+        .notification.info { background: var(--violet); }
+        @keyframes slideIn {
+            0% { opacity:0; transform:translateY(-30px); }
+            100% { opacity:1; transform:translateY(0); }
+        }
+        .navbar {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 1rem;
+        }
+        .navbar-brand { font-size: 1.5rem; font-weight: 700; color: var(--violet); text-decoration: none; }
+        .navbar-nav { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+        .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+        .nav-link:hover { color: var(--violet); }
+        .dashboard-container { display: flex; min-height: calc(100vh - 65px); }
+        .sidebar {
+            width: 260px; background-color: var(--card-bg); border-right: 1px solid var(--border-subtle);
+            padding: 2rem 1rem;
+        }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 0.25rem; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
+            color: var(--text-muted); text-decoration: none; border-radius: 8px; font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background-color: var(--violet); color: white; }
+        .main-content { flex: 1; padding: 2rem; }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        .offer-card {
+            background: var(--soft-white-muted);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        .offer-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .offer-card p {
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .budget-highlight {
+            font-weight: 600;
+            color: var(--violet);
+        }
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #219a52;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: var(--text-muted);
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #555;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification-container" id="notificationContainer"></div>
+    <nav class="navbar">
+        <a href="home.html" class="navbar-brand">TechConnect</a>
+        <div class="navbar-nav" id="navbarNav"></div>
+    </nav>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="../Module%202/home.html">Home</a></li>
+                <li><a href="../Module%202/dashboard.html">Browse Jobs</a></li>
+                <li><a href="../Module%202/post-job.html">Post a Job</a></li>
+                <li><a href="../Module%201/Feature%203%20-%20Profile.html">My Profile</a></li>
+                <li><a href="../Module%202/job-details.html">Job Details</a></li>
+                <li><a href="../Module%203/my-jobs.html" class="active">Pending Offers</a></li>
+                <li><a href="send-offer.html">Send Offer</a></li>
+                <li><a href="submit-milestone.html">Submit Work</a></li>
+                <li><a href="review-milestone.html">Review Work</a></li>
+                <li><a href="#" id="signOutSidebar">Sign out</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <div class="card">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Pending Offers
+                </h3>
+                <div id="offersContainer"></div>
+            </div>
+        </main>
+    </div>
+    <script>
+        // Helper functions
+        function showNotification(message, type = 'info', duration = 4000) {
+            const container = document.getElementById('notificationContainer');
+            if (!container) return;
+            const notif = document.createElement('div');
+            notif.className = `notification ${type}`;
+            notif.textContent = message;
+            container.appendChild(notif);
+            setTimeout(() => {
+                notif.classList.add('hide');
+                notif.addEventListener('animationend', () => notif.remove());
+            }, duration);
+        }
+
+        function getCurrentUser() {
+            return JSON.parse(localStorage.getItem('techconnect_current_user'));
+        }
+
+        function getOffers() {
+            return JSON.parse(localStorage.getItem('techconnect_offers')) || [];
+        }
+
+        function saveOffers(offers) {
+            localStorage.setItem('techconnect_offers', JSON.stringify(offers));
+        }
+
+            // Add getJobs and saveJobs.
+    function getJobs() { return JSON.parse(localStorage.getItem('techconnect_jobs')) || []; }
+    function saveJobs(jobs) { localStorage.setItem('techconnect_jobs', JSON.stringify(jobs)); }
+
+    // Modified acceptOffer
+    function acceptOffer(offerId) {
+        const offers = getOffers();
+        const offer = offers.find(o => o.id === offerId);
+        if (!offer) return;
+        if (offer.status !== 'pending') {
+            showNotification('This offer is no longer available.', 'error');
+            return;
+        }
+        if (new Date() > new Date(offer.expiresAt)) {
+            showNotification('This offer has expired.', 'error');
+            loadOffers();
+            return;
+        }
+        // Update job: set skilledUserID and status
+        const jobs = getJobs();
+        const jobIndex = jobs.findIndex(j => j.id === offer.jobId);
+        if (jobIndex !== -1) {
+            jobs[jobIndex].skilledUserID = offer.freelancerId;
+            jobs[jobIndex].status = 'accepted';
+            saveJobs(jobs);
+        }
+        // Update offer status
+        offer.status = 'accepted';
+        saveOffers(offers);
+        showNotification('Offer accepted! You can now start working.', 'success');
+        loadOffers();
+    }
+
+        function declineOffer(offerId) {
+            if (!confirm('Are you sure you want to decline this offer?')) return;
+            const offers = getOffers();
+            const updated = offers.filter(o => o.id !== offerId);
+            saveOffers(updated);
+            showNotification('Offer declined.', 'info');
+            loadOffers();
+        }
+
+        function formatCurrency(amount) {
+            return amount.toLocaleString() + ' FCFA';
+        }
+
+        function formatExpiry(expiryDate) {
+            const now = new Date();
+            const expiry = new Date(expiryDate);
+            const hoursLeft = Math.max(0, Math.floor((expiry - now) / (1000 * 60 * 60)));
+            return `Expires in ${hoursLeft} hours`;
+        }
+
+        function loadOffers() {
+            const user = getCurrentUser();
+            if (!user) return;
+            const allOffers = getOffers();
+            // Show only offers sent to this freelancer (skilled user)
+            const myOffers = allOffers.filter(o => o.freelancerId === user.uid && o.status === 'pending');
+            const container = document.getElementById('offersContainer');
+            if (myOffers.length === 0) {
+                container.innerHTML = '<div class="empty-state">No pending offers at the moment.</div>';
+                return;
+            }
+            container.innerHTML = myOffers.map(offer => `
+                <div class="offer-card">
+                    <h4>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3"></polyline>
+                            <line x1="12" y1="12" x2="20" y2="7.5"></line>
+                            <line x1="12" y1="12" x2="12" y2="21"></line>
+                            <line x1="12" y1="12" x2="4" y2="7.5"></line>
+                        </svg>
+                        ${escapeHtml(offer.jobTitle)}
+                    </h4>
+                    <p>${escapeHtml(offer.message)}</p>
+                    <p class="budget-highlight">Budget: ${formatCurrency(offer.price)}</p>
+                    <p style="color: var(--text-muted); font-size:0.8rem;">${formatExpiry(offer.expiresAt)}</p>
+                    <div class="btn-group">
+                        <button class="btn btn-success" onclick="acceptOffer(${offer.id})">Accept</button>
+                        <button class="btn btn-secondary" onclick="declineOffer(${offer.id})">Decline</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+        }
+
+        function init() {
+            const user = getCurrentUser();
+            if (!user) {
+                window.location.href = '../Module%201/Feature%202%20-%20Login.html';
+                return;
+            }
+            if (user.role !== 'skilled') {
+                document.getElementById('offersContainer').innerHTML = '<div class="empty-state">Only freelancers can view offers.</div>';
+                return;
+            }
+            const nav = document.getElementById('navbarNav');
+            nav.innerHTML = `
+                <a href="../Module%202/home.html" class="nav-link">Home</a>
+                <a href="../Module%202/dashboard.html" class="nav-link">Browse</a>
+                <a href="../Module%202/post-job.html" class="nav-link">Post Job</a>
+                <a href="../Module%201/Feature%203%20-%20Profile.html" class="nav-link">Profile</a>
+                <a href="#" class="nav-link" id="signOutLink">Sign out</a>
+            `;
+            document.getElementById('signOutLink').addEventListener('click', () => {
+                localStorage.removeItem('techconnect_current_user');
+                window.location.href = '../index.html';
+            });
+            document.getElementById('signOutSidebar').addEventListener('click', () => {
+                localStorage.removeItem('techconnect_current_user');
+                window.location.href = '../index.html';
+            });
+            loadOffers();
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
