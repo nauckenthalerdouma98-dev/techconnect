@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Confirmation · TechConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../common.css">
+  <style>
+    .confirmation-card { max-width: 500px; margin: 4rem auto; text-align: center; }
+    .success-icon { width: 80px; height: 80px; background: #2ecc71; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem; }
+    .error-icon { background: #e74c3c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="confirmation-card auth-card" id="confirmationContent">
+      <div id="icon"></div>
+      <h2 id="statusTitle"></h2>
+      <p id="statusMessage"></p>
+      <a href="../Module%202/home.html" class="btn btn--accent">Return to Dashboard</a>
+    </div>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const transactionId = params.get('transactionId');
+    const amount = params.get('amount');
+
+    const iconDiv = document.getElementById('icon');
+    const title = document.getElementById('statusTitle');
+    const msg = document.getElementById('statusMessage');
+
+    if (status === 'success') {
+      iconDiv.innerHTML = '<div class="success-icon">✓</div>';
+      title.innerText = 'Payment Successful';
+      msg.innerText = `Transaction ID: ${transactionId}\nAmount: ${parseFloat(amount).toLocaleString()} FCFA\nYour job has been activated.`;
+    } else {
+      iconDiv.innerHTML = '<div class="success-icon error-icon">✗</div>';
+      title.innerText = 'Payment Failed';
+      msg.innerText = 'Please try again or contact support.';
+    }
+  </script>
+</body>
+</html>
